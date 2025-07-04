@@ -22,25 +22,22 @@ const MOOD_AESTHETICS = [
   { key: "loungewear", label: "Loungewear", color: "#d1f9e4" },
   { key: "cottage", label: "Cottage Cozy", color: "#c2e9fb" },
 ];
-const PRONOUNS = [
-  "she/her", "he/him", "they/them", "any"
-];
+const PRONOUNS = ["she/her", "he/him", "they/them", "any"];
 const AVATAR_OPTIONS = [
   { key: "fairy", label: "Fairy", emoji: "🧚‍♀️", outfit: "Dream Loungewear" },
   { key: "casual", label: "Casual", emoji: "🧑‍🎤", outfit: "Soft Sweats" },
   { key: "bunny", label: "Bunny", emoji: "🐰", outfit: "Fluffy Hoodie" },
-  { key: "pajamas", label: "Pajamas", emoji: "🛌", outfit: "Pastel Pajamas" }
+  { key: "pajamas", label: "Pajamas", emoji: "🛌", outfit: "Pastel Pajamas" },
 ];
 const POSE_OPTIONS = [
   { key: "sit", label: "Sitting", emoji: "🪑" },
   { key: "stand", label: "Standing", emoji: "🧍" },
   { key: "hug", label: "Hugging", emoji: "🤗" },
-  { key: "twirl", label: "Twirl", emoji: "🩰" }
+  { key: "twirl", label: "Twirl", emoji: "🩰" },
 ];
 
-// --- Helper: Floating Sparkle/Particle Animation ---
+// -- Particle animation ambient bg
 function CozyParticles({ count = 18 }) {
-  // spawn floating, pastel sparkles as ambient bg
   return (
     <div style={{
       pointerEvents: "none",
@@ -79,7 +76,7 @@ function CozyParticles({ count = 18 }) {
   );
 }
 
-// --- Helper: Pastel Radio Button Chip ---
+// Pastel Radio Chip Button (for aesthetic, scent, etc.)
 function PastelRadioChip({ active, value, onClick, color, children }) {
   return (
     <button
@@ -97,7 +94,7 @@ function PastelRadioChip({ active, value, onClick, color, children }) {
         borderRadius: 21,
         transition: "all 0.17s",
         fontSize: "1.01em",
-        fontFamily: "'Poppins', cursive",
+        fontFamily: `'Poppins', cursive`,
         padding: "0.56em 1.6em",
         margin: "0.11em 0.33em"
       }}
@@ -111,12 +108,12 @@ function PastelRadioChip({ active, value, onClick, color, children }) {
   );
 }
 
-// --- Helper: Gentle Toggle ---
+// Gentle Toggle Switch
 function GentleToggle({ checked, onChange, label }) {
   return (
     <label style={{
       display: "flex", alignItems: "center", cursor: "pointer",
-      gap: "0.73em", fontSize: "1em", fontFamily: "'Poppins',cursive"
+      gap: "0.73em", fontSize: "1em", fontFamily: `'Poppins',cursive`
     }}>
       <div
         style={{
@@ -151,7 +148,7 @@ function GentleToggle({ checked, onChange, label }) {
   );
 }
 
-// --- Helper: Animated Button ---
+// Soft pastel main button
 function SoftButton({ children, ...props }) {
   return (
     <button
@@ -164,18 +161,19 @@ function SoftButton({ children, ...props }) {
         boxShadow: "0 3px 15px #ffd1dc28",
         padding: "0.9em 2.3em",
         letterSpacing: "0.03em",
-        fontFamily: "'Poppins', cursive"
+        fontFamily: `'Poppins', cursive`
       }}
       {...props}
     >{children}</button>
   );
 }
 
-// --- PUBLIC_INTERFACE
+// PUBLIC_INTERFACE
 /**
  * PUBLIC_INTERFACE
  * ProfileScreen
- * Profile with dreamy UI, now using floaty left-aligned grid/sections and soft pastel "bubbles" for each input, wide and responsive.
+ * Refactored layout: All profile form fields in pastel floating row/grid bubbles, wide left-aligned with generous spacing.
+ * Profile picture upload & name at the very top; a large soft-cornered bio. Soft underline dividers, responsive grid, ambient particles.
  */
 function ProfileScreen() {
   // Form and local state
@@ -221,94 +219,8 @@ function ProfileScreen() {
   // Avatar/pose info
   const avatarObj = AVATAR_OPTIONS.find(x => x.key === avatar) || AVATAR_OPTIONS[0];
   const poseObj = POSE_OPTIONS.find(x => x.key === pose) || POSE_OPTIONS[0];
-  const scentLabel = SCENT_OPTIONS.find(x => x.key === roomScent)?.label || "";
-  const aestheticLabel = MOOD_AESTHETICS.find(x => x.key === aesthetic)?.label || "";
 
-  // --- BUBBLE STYLES ---
-  const pastelBubbles = [
-    {
-      key: "pic",
-      style: {
-        gridColumn: "span 2",
-        background: "linear-gradient(115deg, #c2e9fbcc 80%, #ffd1dcbd 120%)",
-        marginBottom: "2.2em"
-      }
-    },
-    {
-      key: "name-dob-row",
-      style: {
-        background: "linear-gradient(96deg, #fff6fa 80%, #b794f617 100%)",
-        marginBottom: "0.6em",
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "2em"
-      }
-    },
-    {
-      key: "gender-row",
-      style: {
-        background: "linear-gradient(100deg, #ffeaf7 95%, #c2e9fb17 130%)",
-        marginBottom: "0.6em",
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "1.7em"
-      }
-    },
-    {
-      key: "bio",
-      style: {
-        background: "linear-gradient(90deg, #fff8fd 85%, #ffd1dc18 120%)",
-        marginBottom: "1.25em"
-      }
-    },
-    {
-      key: "music",
-      style: {
-        background: "linear-gradient(115deg, #c2e9fb38 60%, #b794f653 95%)",
-        marginBottom: "1.16em"
-      }
-    },
-    {
-      key: "scent",
-      style: {
-        background: "linear-gradient(100deg, #ffd1dc55 90%, #c2e9fb33 120%)",
-        marginBottom: "1.10em"
-      }
-    },
-    {
-      key: "aesthetic",
-      style: {
-        background: "linear-gradient(115deg, #b794f614 80%, #ffd1dc55 120%)",
-        marginBottom: "1.07em"
-      }
-    },
-    {
-      key: "avatar-row",
-      style: {
-        background: "linear-gradient(108deg, #c2e9fb60 82%, #b794f622 124%)",
-        marginBottom: "1.1em"
-      }
-    },
-    {
-      key: "miniMood",
-      style: {
-        background: "linear-gradient(92deg, #ffd1dc39 60%, #fffefa 100%)",
-        marginBottom: "1.2em"
-      }
-    },
-    {
-      key: "toggles",
-      style: {
-        background: "linear-gradient(92deg, #b794f617 60%, #ffd1dc47 100%)",
-        marginBottom: "1.5em"
-      }
-    }
-  ];
-
-  // --- Responsive layout styles ---------
-  // We'll create a wrapper and use a CSS grid that's 1 column on mobile, 2-column on wide.
-  // Section bubbles get gridColumn based on type and will float with margin
-
+  // ---- Fully refactored wide grid/section bubble layout -------
   return (
     <>
       <CozyParticles count={16} />
@@ -326,54 +238,50 @@ function ProfileScreen() {
           className="profile-sections-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: "2.2em 2.6em",
+            gridTemplateColumns: "repeat(auto-fit, minmax(325px, 1fr))",
+            gap: "2.1em 2.5em",
             maxWidth: 1040,
             padding: "clamp(1.2em,3vw,3.8em) clamp(0.4em,4vw,2.5em)",
-            margin: "3.8rem auto 2.8rem auto",
+            margin: "3.2rem auto 2.4rem auto",
             width: "100%",
           }}
         >
-          {/* Header, float across full width */}
-          <h1 className="whimsical" style={{
-            gridColumn: "span 2",
-            textAlign: "left",
-            paddingLeft: "0.3em",
-            marginBottom: "0.5em"
-          }}>Profile</h1>
-
-          {/* Profile pic (wide bubble) */}
-          <section className="profile-bubble profile-pic-bubble"
+          {/* Heading (span 2 columns on desktop, 1 on mobile) */}
+          <h1 className="whimsical"
             style={{
-              ...pastelBubbles[0].style,
+              gridColumn: "span 2",
+              textAlign: "left",
+              paddingLeft: "0.3em",
+              marginBottom: "0.3em"
+            }}>Profile</h1>
+
+          {/* Profile picture + name bubble (always top and wide) */}
+          <section
+            className="profile-bubble pastel-bubble profile-pic-section"
+            style={{
+              gridColumn: "span 2",
+              background: "linear-gradient(115deg, #c2e9fbcc 80%, #ffd1dcbd 120%)",
               borderRadius: 39,
-              boxShadow: "0 5px 35px #b794f617, 0 4px 14px #ffd1dc19"
+              boxShadow: "0 5px 35px #b794f617, 0 4px 14px #ffd1dc19",
+              marginBottom: "1.8em",
+              padding: "2.3em 2.2em"
             }}
           >
-            <div style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1.3em"
-            }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "2.1em", flexWrap: "wrap" }}>
               <div className="profile-img-preview"
                 style={{
-                  width: 94,
-                  height: 94,
-                  borderRadius: 48,
+                  width: 108, height: 108, borderRadius: 60,
                   background: "linear-gradient(140deg, #c2e9fb 70%, #ffd1dc 130%)",
                   boxShadow: "0 1.6px 10px #ffd1dc33, 0 2.4px 25px #b794f660",
-                  display: "flex",
-                  alignItems: "center", justifyContent: "center",
-                  border: "3.2px solid #fff8fd", overflow: "hidden",
-                  marginRight: "1.2em", position: "relative"
-                }}
-              >
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  border: "3px solid #fff8fd", overflow: "hidden",
+                  marginRight: "1em", position: "relative"
+                }}>
                 {picUrl ? (
                   <img
                     src={picUrl}
                     alt="Profile preview"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 48, border: "0", filter: "brightness(1) drop-shadow(0 2px 9px #ffd1dc75)" }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 60, border: "0", filter: "brightness(1) drop-shadow(0 2px 9px #ffd1dc75)" }}
                     className="rounded-img"
                   />
                 ) : (
@@ -391,9 +299,9 @@ function ProfileScreen() {
                     cursor: "pointer",
                     fontSize: "1.01em",
                     borderRadius: 17,
-                    padding: "0.18em 1.3em",
+                    padding: "0.13em 1.05em",
                     position: "absolute",
-                    bottom: -28,
+                    bottom: -30,
                     left: "50%",
                     transform: "translateX(-50%)",
                     background: "linear-gradient(120deg, #ffd1dc 81%, #c2e9fb76 150%)",
@@ -411,7 +319,7 @@ function ProfileScreen() {
                   />
                 </label>
               </div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 210 }}>
                 <div style={{
                   fontFamily: "'Poppins', cursive",
                   color: "#b794f6",
@@ -431,50 +339,50 @@ function ProfileScreen() {
                     : "Add a selfie, an avatar, or something gentle you like."}
                 </div>
               </div>
+              <div style={{ minWidth: 220, marginLeft: "auto", display: "flex", flexDirection: "column", gap: "0.5em" }}>
+                <label htmlFor="name" style={{
+                  fontFamily: "'Poppins', cursive",
+                  color: "#b794f6", fontWeight: 600, fontSize: "1.07em"
+                }}>
+                  Name<br />
+                  <input
+                    type="text"
+                    id="name"
+                    style={{ width: 142, marginRight: 10 }}
+                    placeholder="Your name"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                  />
+                </label>
+                <label htmlFor="dob" style={{
+                  fontFamily: "'Poppins', cursive",
+                  color: "#b794f6", fontWeight: 600, fontSize: "1.07em"
+                }}>
+                  DOB<br />
+                  <input
+                    type="date"
+                    id="dob"
+                    style={{ width: 122 }}
+                    value={dob}
+                    onChange={e => setDob(e.target.value)}
+                  />
+                </label>
+              </div>
             </div>
           </section>
 
-          {/* Name/DOB bubble */}
-          <section className="profile-bubble profile-row"
-            style={{ ...pastelBubbles[1].style, borderRadius: 25, boxShadow: "0 3px 15px #b794f604" }}
-          >
-            <label htmlFor="name"
-              style={{
-                fontFamily: "'Poppins', cursive",
-                color: "#b794f6",
-                fontWeight: 600,
-                fontSize: "1.07em"
-              }}>
-              Name<br />
-              <input
-                type="text"
-                id="name"
-                style={{ width: 152, marginRight: 10 }}
-                placeholder="Your name"
-                value={name}
-                onChange={e => setName(e.target.value)}
-              />
-            </label>
-            <label htmlFor="dob"
-              style={{
-                fontFamily: "'Poppins', cursive",
-                color: "#b794f6",
-                fontWeight: 600, fontSize: "1.07em"
-              }}>
-              DOB<br />
-              <input
-                type="date"
-                id="dob"
-                style={{ width: 122 }}
-                value={dob}
-                onChange={e => setDob(e.target.value)}
-              />
-            </label>
-          </section>
-
           {/* Gender/Pronouns bubble */}
-          <section className="profile-bubble profile-row"
-            style={{ ...pastelBubbles[2].style, borderRadius: 25, boxShadow: "0 3px 15px #b794f61f" }}
+          <section className="profile-bubble profile-row pastel-bubble"
+            style={{
+              background: "linear-gradient(100deg, #ffeaf7 95%, #c2e9fb17 130%)",
+              borderRadius: 27,
+              boxShadow: "0 2px 14px #b794f61a",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              gap: "2.4em",
+              marginBottom: "0.6em"
+            }}
           >
             <label htmlFor="gender" style={{
               fontFamily: "'Poppins', cursive", color: "#b794f6",
@@ -484,7 +392,7 @@ function ProfileScreen() {
               <input
                 type="text"
                 id="gender"
-                style={{ width: 120 }}
+                style={{ width: 130 }}
                 placeholder="Type or leave blank"
                 value={gender}
                 onChange={e => setGender(e.target.value)}
@@ -516,9 +424,16 @@ function ProfileScreen() {
             </label>
           </section>
 
-          {/* Bio bubble */}
-          <section className="profile-bubble"
-            style={{ ...pastelBubbles[3].style, borderRadius: 23, boxShadow: "0 2px 12px #ffd1dc19" }}
+          {/* Large Bio bubble */}
+          <section className="profile-bubble pastel-bubble"
+            style={{
+              background: "linear-gradient(90deg, #fff8fd 85%, #ffd1dc18 120%)",
+              borderRadius: 27,
+              boxShadow: "0 2.5px 13px #b794f61d",
+              marginBottom: "1.1em",
+              gridColumn: "span 2",
+              minHeight: 86
+            }}
           >
             <label style={{
               fontFamily: "'Poppins', cursive",
@@ -531,15 +446,15 @@ function ProfileScreen() {
               <textarea
                 style={{
                   width: "100%",
-                  minHeight: 38,
+                  minHeight: 62,
                   resize: "none",
                   background: "#fff6fa",
                   border: "1.8px solid #eee9f6",
-                  borderRadius: "14px",
-                  padding: "10px 12px",
-                  fontSize: "1.03em",
+                  borderRadius: "17px",
+                  padding: "14px 15px",
+                  fontSize: "1.08em",
                   color: "#34243a",
-                  opacity: 0.87,
+                  opacity: 0.89,
                   outline: "none",
                   marginBottom: 0
                 }}
@@ -551,11 +466,18 @@ function ProfileScreen() {
             </label>
           </section>
 
-          {/* Music Player Selector bubble */}
-          <section className="profile-bubble"
-            style={{ ...pastelBubbles[4].style, borderRadius: 23, boxShadow: "0 2.5px 11px #b794f61a" }}
+          {/* Music, Scent, Aesthetic (as grid bubbles) */}
+          <section className="profile-bubble pastel-bubble"
+            style={{
+              background: "linear-gradient(115deg, #c2e9fb38 60%, #b794f653 95%)",
+              borderRadius: 24,
+              boxShadow: "0 2.5px 11px #b794f61a",
+              marginBottom: "1.07em"
+            }}
           >
-            <span style={{ fontFamily: "'Poppins', cursive", fontWeight: 700, color: "#b794f6", fontSize: "1.13em", marginBottom: "0.02em" }}>
+            <span style={{
+              fontFamily: "'Poppins', cursive", fontWeight: 700, color: "#b794f6", fontSize: "1.11em", marginBottom: "0.1em"
+            }}>
               Profile Music&nbsp;
               <span style={{ fontWeight: 400, fontSize: "0.95em", color: "#8a7fae", marginLeft: 7 }}>(autoplays)</span>
             </span>
@@ -577,12 +499,14 @@ function ProfileScreen() {
               ))}
             </div>
           </section>
-
-          {/* Room Scent picker bubble */}
-          <section className="profile-bubble"
-            style={{ ...pastelBubbles[5].style, borderRadius: 23, boxShadow: "0 2px 10px #ffd1dc19" }}
-          >
-            <span style={{ fontFamily: "'Poppins', cursive", fontWeight: 700, color: "#b794f6", fontSize: "1.09em" }}>
+          <section className="profile-bubble pastel-bubble"
+            style={{
+              background: "linear-gradient(100deg, #ffd1dc55 90%, #c2e9fb33 120%)",
+              borderRadius: 21,
+              boxShadow: "0 2px 10px #ffd1dc16",
+              marginBottom: "1.07em"
+            }}>
+            <span style={{ fontFamily: "'Poppins', cursive", fontWeight: 700, color: "#b794f6", fontSize: "1.10em" }}>
               Room Scent
             </span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35em 0.9em", alignItems: "center", marginTop: 3 }}>
@@ -602,11 +526,13 @@ function ProfileScreen() {
               ))}
             </div>
           </section>
-
-          {/* Mood Aesthetic bubble */}
-          <section className="profile-bubble"
-            style={{ ...pastelBubbles[6].style, borderRadius: 23, boxShadow: "0 2px 10px #b794f614" }}
-          >
+          <section className="profile-bubble pastel-bubble"
+            style={{
+              background: "linear-gradient(115deg, #b794f614 80%, #ffd1dc55 120%)",
+              borderRadius: 21,
+              boxShadow: "0 2px 10px #b794f614",
+              marginBottom: "1.07em"
+            }}>
             <span style={{ fontFamily: "'Poppins', cursive", fontWeight: 700, color: "#b794f6", fontSize: "1.09em" }}>
               Mood Aesthetic
             </span>
@@ -628,10 +554,14 @@ function ProfileScreen() {
             </div>
           </section>
 
-          {/* Avatar & Pose bubble */}
-          <section className="profile-bubble"
-            style={{ ...pastelBubbles[7].style, borderRadius: 23, boxShadow: "0 2px 13px #c2e9fb1a" }}
-          >
+          {/* Avatar & pose bubble */}
+          <section className="profile-bubble pastel-bubble"
+            style={{
+              background: "linear-gradient(108deg, #c2e9fb60 82%, #b794f622 124%)",
+              borderRadius: 22,
+              boxShadow: "0 2px 14px #c2e9fb16",
+              marginBottom: "1.07em"
+            }}>
             <span style={{ fontFamily: "'Poppins', cursive", fontWeight: 700, color: "#b794f6", fontSize: "1.09em" }}>
               Avatar & Pose
             </span>
@@ -655,7 +585,7 @@ function ProfileScreen() {
                 </PastelRadioChip>
               ))}
               <span style={{
-                marginLeft: "1.3em",
+                marginLeft: "1.0em",
                 fontFamily: "'Poppins', cursive", fontWeight: 700,
                 color: "#b794f6", fontSize: "1em"
               }}>Pose:</span>
@@ -668,28 +598,33 @@ function ProfileScreen() {
                   onClick={() => setPose(pos.key)}
                 >
                   {pos.emoji}
-                  <span style={{ marginLeft: 3, fontSize: "0.97em", color: "#8a7fae" }}>{pos.label}</span>
+                  <span style={{ marginLeft: 4, fontSize: "0.98em", color: "#8a7fae" }}>{pos.label}</span>
                 </PastelRadioChip>
               ))}
             </div>
             <div style={{
-              marginTop: "0.57em",
+              marginTop: "0.32em",
               display: "flex",
               alignItems: "center",
               fontFamily: "'Poppins', cursive",
               fontWeight: 500,
               color: "#8a7fae",
-              fontSize: "0.95em"
+              fontSize: "0.94em"
             }}>
-              Now: <span role="img" aria-label="avatar" style={{ fontSize: "1.5em", margin: "0 7px" }}>{avatarObj.emoji}</span>
-              <span role="img" aria-label="pose" style={{ fontSize: "1.2em", margin: "0 2px" }}>{poseObj.emoji}</span>
+              Now: <span role="img" aria-label="avatar" style={{ fontSize: "1.4em", margin: "0 7px" }}>{avatarObj.emoji}</span>
+              <span role="img" aria-label="pose" style={{ fontSize: "1.16em", margin: "0 2px" }}>{poseObj.emoji}</span>
               in <span style={{ fontWeight: 600, marginLeft: 4 }}>{avatarObj.outfit}</span>
             </div>
           </section>
 
-          {/* Mini Mood Status bubble */}
-          <section className="profile-bubble"
-            style={{ ...pastelBubbles[8].style, borderRadius: 20, boxShadow: "0 1.7px 8px #ffd1dc18" }}
+          {/* Mini mood (short status) */}
+          <section className="profile-bubble pastel-bubble"
+            style={{
+              background: "linear-gradient(92deg, #ffd1dc39 60%, #fffefa 100%)",
+              borderRadius: 18,
+              boxShadow: "0 1.7px 8px #ffd1dc18",
+              marginBottom: "0.98em"
+            }}
           >
             <label style={{
               fontFamily: "'Poppins', cursive", color: "#b794f6", fontWeight: 600, textAlign: "left", width: "100%"
@@ -706,10 +641,14 @@ function ProfileScreen() {
             </label>
           </section>
 
-          {/* Toggles bubble */}
-          <section className="profile-bubble"
-            style={{ ...pastelBubbles[9].style, borderRadius: 18, boxShadow: "0 1.8px 6px #b794f61f", display: "flex", gap: "1.5em", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-start" }}
-          >
+          {/* Toggles (explore, notes) bubble */}
+          <section className="profile-bubble pastel-bubble"
+            style={{
+              background: "linear-gradient(92deg, #b794f617 60%, #ffd1dc47 100%)",
+              borderRadius: 17,
+              boxShadow: "0 1.8px 6px #b794f61f",
+              display: "flex", gap: "1.3em", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-start"
+            }}>
             <GentleToggle
               checked={exploreVisible}
               onChange={setExploreVisible}
@@ -722,8 +661,8 @@ function ProfileScreen() {
             />
           </section>
 
-          {/* Save/Update & Preview buttons (spans grid for mobile) */}
-          <section style={{ gridColumn: "span 2", display: "flex", gap: "1.2em", marginTop: 13, paddingLeft: 4 }}>
+          {/* Save/Preview buttons - always full-width row */}
+          <section style={{ gridColumn: "span 2", display: "flex", gap: "1.2em", marginTop: 7, paddingLeft: 4 }}>
             <SoftButton type="submit" style={{
               background: "linear-gradient(95deg, #ffd1dc 81%, #b794f6 120%)",
               color: "#fff", border: "none"
@@ -734,20 +673,22 @@ function ProfileScreen() {
             }}>Preview</SoftButton>
           </section>
         </form>
+        {/* Gentle hint/info section divider */}
         <div style={{
-          margin: "1.8em auto 2.2em auto",
-          maxWidth: 660,
+          margin: "1.7em auto 2.0em auto",
+          maxWidth: 710,
           borderRadius: "23px",
           background: "rgba(194,233,251,0.13)",
-          boxShadow: "0 1.8px 16px #ffd1dc18",
-          padding: "1.3em 1.1em 1.1em 1.1em",
+          boxShadow: "0 1.8px 16px #ffd1dc1a",
+          borderBottom: "2.1px solid #eee9f6",
+          padding: "1.25em 1.1em 1em 1.1em",
           color: "#b794f6",
           fontFamily: "'Poppins', cursive",
           fontWeight: 700,
           fontSize: "1.07em",
           textAlign: "left"
         }}>
-          Profile is your gentle corner — express, customize, and comfort yourself! 
+          Profile is your gentle corner — express, customize, and comfort yourself!
           {miniMood && <span style={{ color: "#8a7fae", fontStyle: "italic", marginLeft: 8 }}>Mood: {miniMood}</span>}
         </div>
       </main>
@@ -772,27 +713,37 @@ function ProfileScreen() {
           }
           .pastel-chip:focus, .pastel-chip:hover {
             background: linear-gradient(91deg, #ffd1dc, #b794f6 140%);
-            color: #fff;
+            color: #fff !important;
             outline: none;
             border: 2.2px solid #ffd1dc;
             box-shadow: 0 3px 13px #ffd1dc6a;
             transform: scale(1.04);
           }
-          /* Bubble fade/glow effect */
           .profile-bubble {
-            animation: bubbleFloatIn 1.1s cubic-bezier(.59,1.11,.49,0.99);
+            margin-bottom: 0;
+            margin-top: 0;
+            animation: bubbleFloatIn 1.08s cubic-bezier(.63,1.13,.47,0.95);
             will-change: opacity, transform;
+            border-bottom: 2.25px solid #eee9f6;
+          }
+          .profile-bubble:last-child {
+            border-bottom: none;
           }
           @keyframes bubbleFloatIn {
             from { opacity: 0; transform: translateY(41px) scale(0.98);}
             to   { opacity: 1; transform: translateY(0) scale(1);}
           }
-          @media (max-width: 850px) {
+          /* Responsive: grid collapses to 1 column on small screens */
+          @media (max-width: 900px) {
             .profile-sections-grid { grid-template-columns: 1fr !important;}
+          }
+          @media (max-width: 500px) {
+            .profile-pic-section { flex-direction: column !important; align-items: flex-start !important;}
           }
         `}
       </style>
     </>
   );
 }
+
 export default ProfileScreen;
