@@ -52,30 +52,9 @@ const QUIZ_STEPS = [
 
 const SPARKLE_EMOJIS = ["✨", "🌟", "💖", "🫧", "🌸", "⭐"];
 
-const dreamySpotifyResults = [
-  // Placeholder static tracks for visuals; real fetch would use Spotify API
-  {
-    name: "Pastel Skies",
-    artist: "Dream Lofi",
-    spotify: "https://open.spotify.com/embed/track/3qEIdv5fVyASgBycn8THwW",
-    mood: "dreamy"
-  },
-  {
-    name: "Cloud Blanket",
-    artist: "AmbientCo",
-    spotify: "https://open.spotify.com/embed/track/5Wn4R9uqti10li8wZPCAlX",
-    mood: "cozy"
-  },
-  {
-    name: "Lavender Glow",
-    artist: "Soft Beats",
-    spotify: "https://open.spotify.com/embed/track/3pzVPn4KDK7xIdGvTnR9E5",
-    mood: "chill"
-  }
-];
-
 // ---- Helper: Animated Sparkle Emoji Bubbles (floating, gentle drift) ----
 function FloatingSparkles({ count = 14, fadeIn = true }) {
+  // Randomize their positions and sparkle emojis
   return (
     <div style={{ pointerEvents: "none", position: "absolute", left: 0, top: 0, width: "100%", height: "100%", zIndex: 6 }}>
       {[...Array(count)].map((_, i) => {
@@ -98,6 +77,7 @@ function FloatingSparkles({ count = 14, fadeIn = true }) {
               animationDelay: `${delay}s`,
               filter: "blur(0.35px)"
             }}
+            aria-hidden="true"
           >{emoji}</span>
         );
       })}
@@ -109,7 +89,8 @@ function FloatingSparkles({ count = 14, fadeIn = true }) {
           50%  { opacity: 1; transform: translateY(-13px) scale(1.08);}
           80%  { opacity: .59; }
           100% { opacity: 0; transform: scale(1) translateY(13px);}
-        }`}
+        }
+      `}
       </style>
     </div>
   );
@@ -234,7 +215,7 @@ function MusicMoodQuizCard({ step, value, onSelect, stepIdx, totalSteps, sparkle
         fontFamily: "'Poppins', cursive",
         fontSize: "0.97em"
       }}>
-        Step {stepIdx + 1} <span style={{opacity:0.4}}>of</span> {totalSteps}
+        Step {stepIdx + 1} <span style={{ opacity: 0.4 }}>of</span> {totalSteps}
       </div>
       <style>
         {`
@@ -328,7 +309,29 @@ function MusicBarIntro({ onStart }) {
   );
 }
 
-// ---- Result Card (dreamy, shows recommended tracks) ----
+// Placeholder dreamy tracks; future: integrate with API/Spotify
+const dreamySpotifyResults = [
+  {
+    name: "Pastel Skies",
+    artist: "Dream Lofi",
+    spotify: "https://open.spotify.com/embed/track/3qEIdv5fVyASgBycn8THwW",
+    mood: "dreamy"
+  },
+  {
+    name: "Cloud Blanket",
+    artist: "AmbientCo",
+    spotify: "https://open.spotify.com/embed/track/5Wn4R9uqti10li8wZPCAlX",
+    mood: "cozy"
+  },
+  {
+    name: "Lavender Glow",
+    artist: "Soft Beats",
+    spotify: "https://open.spotify.com/embed/track/3pzVPn4KDK7xIdGvTnR9E5",
+    mood: "chill"
+  }
+];
+
+// ---- Quiz Results Card (soft pastel, gentle intro) ----
 function QuizResults({ selections, onRetake }) {
   // In real implementation, would fetch Spotify tracks matching traits
   // Here, filter mock data for mood and shuffle in random order for demo
@@ -336,7 +339,7 @@ function QuizResults({ selections, onRetake }) {
   if (selections?.mood) {
     filtered = dreamySpotifyResults.filter(x=>x.mood === selections.mood) || dreamySpotifyResults;
   }
-  // Shuffle some for visual interest
+  // Shuffle for visual interest
   filtered = [...filtered].sort(()=>Math.random()-0.5);
   // Dreamy result transition (fade in, pastel float)
   return (
