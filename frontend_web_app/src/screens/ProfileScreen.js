@@ -149,7 +149,7 @@ function GentleToggle({ checked, onChange, label }) {
 }
 
 // Soft pastel main button
-function SoftButton({ children, ...props }) {
+function SoftButton({ children, style, ...props }) {
   return (
     <button
       className="pastel-btn"
@@ -161,19 +161,72 @@ function SoftButton({ children, ...props }) {
         boxShadow: "0 3px 15px #ffd1dc28",
         padding: "0.9em 2.3em",
         letterSpacing: "0.03em",
-        fontFamily: `'Poppins', cursive`
+        fontFamily: `'Poppins', cursive`,
+        ...style
       }}
       {...props}
     >{children}</button>
   );
 }
 
+// Star sparkle animation (after save)
+function FloatingSaveSparkles({ visible }) {
+  if (!visible) return null;
+  // Star/sparkle cluster near the button, animating upward/floating
+  const sparkCount = 6 + Math.floor(Math.random() * 3);
+  const EMOJIS = ["✨", "⭐", "🫧", "💖"];
+  const items = Array.from({ length: sparkCount });
+  return (
+    <div style={{
+      position: "absolute",
+      left: "60%",
+      top: "-34px",
+      pointerEvents: "none",
+      zIndex: 33,
+      width: 110,
+      height: 42,
+    }}>
+      {
+        items.map((_, i) => (
+          <span
+            key={i}
+            style={{
+              position: "absolute",
+              left: `${40 + Math.random() * 40 - i * 7}px`,
+              top: `${Math.random() * 16 + i * 2}px`,
+              opacity: 0.7 + Math.random() * 0.3,
+              fontSize: `${22 + Math.random() * 10}px`,
+              animation: `floatSaveSparkle 1.08s ${0.12 * i}s both`,
+              filter: "blur(0.05px)",
+              color: "#b794f6",
+              textShadow: "0 1px 8px #ffd1dc38, 0 2px 13px #b794f647",
+            }}
+            aria-hidden="true"
+          >{EMOJIS[i % EMOJIS.length]}</span>
+        ))
+      }
+      <style>
+        {`
+          @keyframes floatSaveSparkle {
+            0% { opacity: 0; transform: translateY(20px) scale(1); }
+            28% { opacity: 1; transform: translateY(-5px) scale(1.11); }
+            65% { opacity: 1; }
+            100% { opacity: .01; transform: translateY(-27px) scale(0.7);}
+          }
+        `}
+      </style>
+    </div>
+  );
+}
+
+const LOCALSTORAGE_KEY = "cozydreams-profile";
+
 // PUBLIC_INTERFACE
-/**
+/** 
  * PUBLIC_INTERFACE
  * ProfileScreen
- * Refactored layout: All profile form fields in pastel floating row/grid bubbles, wide left-aligned with generous spacing.
- * Profile picture upload & name at the very top; a large soft-cornered bio. Soft underline dividers, responsive grid, ambient particles.
+ * Now saves and restores all profile fields using localStorage, shows gentle confirmation on save,
+ * animates sparkles, and glows Save button if changes are unsaved. Instant UI updating.
  */
 function ProfileScreen() {
   // Form and local state
@@ -193,15 +246,81 @@ function ProfileScreen() {
   const [miniMood, setMiniMood] = useState("");
   const [exploreVisible, setExploreVisible] = useState(true);
   const [acceptNotes, setAcceptNotes] = useState(true);
+  // Data for unsaved change tracking
+  const [initialData, setInitialData] = useState(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [showSparkle, setShowSparkle] = useState(false);
+
+  // --- Load profile from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LOCALSTORAGE_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        setName(d.name || "");
+        setDob(d.dob || "");
+        setGender(d.gender || "");
+        setPronouns(d.pronouns || PRONOUNS[2]);
+        setBio(d.bio || "");
+        setMiniMood(d.miniMood || "");
+        setPicUrl(d.picUrl || "");
+        setMusic(d.music || "lofi");
+        setRoomScent(d.roomScent || SCENT_OPTIONS[0].key);
+        setAesthetic(d.aesthetic || MOOD_AESTHETICS[0].key);
+        setAvatar(d.avatar || AVATAR_OPTIONS[0].key);
+        setPose(d.pose || POSE_OPTIONS[0].key);
+        setExploreVisible(d.exploreVisible === undefined ? true : !!d.exploreVisible);
+        setAcceptNotes(d.acceptNotes === undefined ? true : !!d.acceptNotes);
+        // preserve full original for later unsaved checking
+        setInitialData({
+          name: d.name || "",
+          dob: d.dob || "",
+          gender: d.gender || "",
+          pronouns: d.pronouns || PRONOUNS[2],
+          bio: d.bio || "",
+          miniMood: d.miniMood || "",
+          picUrl: d.picUrl || "",
+          music: d.music || "lofi",
+          roomScent: d.roomScent || SCENT_OPTIONS[0].key,
+          aesthetic: d.aesthetic || MOOD_AESTHETICS[0].key,
+          avatar: d.avatar || AVATAR_OPTIONS[0].key,
+          pose: d.pose || POSE_OPTIONS[0].key,
+          exploreVisible: d.exploreVisible === undefined ? true : !!d.exploreVisible,
+          acceptNotes: d.acceptNotes === undefined ? true : !!d.acceptNotes,
+        });
+      } else {
+        setInitialData({
+          name: "",
+          dob: "",
+          gender: "",
+          pronouns: PRONOUNS[2],
+          bio: "",
+          miniMood: "",
+          picUrl: "",
+          music: "lofi",
+          roomScent: SCENT_OPTIONS[0].key,
+          aesthetic: MOOD_AESTHETICS[0].key,
+          avatar: AVATAR_OPTIONS[0].key,
+          pose: POSE_OPTIONS[0].key,
+          exploreVisible: true,
+          acceptNotes: true,
+        });
+      }
+    } catch {
+      // ignore parse errors
+    }
+    // eslint-disable-next-line
+  }, []);
 
   // --- Music Player logic ---
-  const playerRef = useRef();
+  const prevAudio = useRef();
   useEffect(() => {
     if (audio) {
       audio.pause();
       audio.remove();
     }
     setAudio(null);
+    // eslint-disable-next-line
     return () => {
       if (audio) audio.pause();
     };
@@ -212,13 +331,63 @@ function ProfileScreen() {
   function onPicChange(e) {
     if (e.target.files && e.target.files[0]) {
       setProfilePic(e.target.files[0]);
-      setPicUrl(URL.createObjectURL(e.target.files[0]));
+      const url = URL.createObjectURL(e.target.files[0]);
+      setPicUrl(url);
     }
   }
 
   // Avatar/pose info
   const avatarObj = AVATAR_OPTIONS.find(x => x.key === avatar) || AVATAR_OPTIONS[0];
   const poseObj = POSE_OPTIONS.find(x => x.key === pose) || POSE_OPTIONS[0];
+
+  // Returns the data in exactly the saved format for comparison and for persistence.
+  function getProfileDataObj() {
+    return {
+      name, dob, gender, pronouns, bio, miniMood,
+      picUrl, // Note: we persist only the URL (for local file uploads, this is session-based)
+      music, roomScent, aesthetic, avatar, pose,
+      exploreVisible, acceptNotes
+    };
+  }
+
+  // Helper: does any field differ from initialData (for unsaved changes detection)
+  function hasUnsavedChanges() {
+    if (!initialData) return false;
+    const curr = getProfileDataObj();
+    for (const k of Object.keys(curr)) {
+      if (curr[k] !== initialData[k]) return true;
+    }
+    return false;
+  }
+
+  // Save handler -- update localStorage, update UI
+  function handleSave(e) {
+    if (e) e.preventDefault();
+    const profileData = getProfileDataObj();
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(profileData));
+    setInitialData({ ...profileData });
+    setIsSaved(true);
+    setShowSparkle(true);
+    setTimeout(() => setIsSaved(false), 1800);
+    setTimeout(() => setShowSparkle(false), 1700);
+  }
+
+  // Save shortcut on Ctrl+S (or Command+S)
+  useEffect(() => {
+    const onKeyDown = e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line
+  }, [name, dob, gender, pronouns, bio, miniMood, picUrl,
+      music, roomScent, aesthetic, avatar, pose, exploreVisible, acceptNotes, initialData]);
+
+  // --- Live update for Name + Pronouns at top ---
+  // This is already reflected in the "Welcome, {name}" and pronouns in the header section
 
   // ---- Fully refactored wide grid/section bubble layout -------
   return (
@@ -245,6 +414,7 @@ function ProfileScreen() {
             margin: "3.2rem auto 2.4rem auto",
             width: "100%",
           }}
+          onSubmit={handleSave}
         >
           {/* Heading (span 2 columns on desktop, 1 on mobile) */}
           <h1 className="whimsical"
@@ -253,7 +423,17 @@ function ProfileScreen() {
               textAlign: "left",
               paddingLeft: "0.3em",
               marginBottom: "0.3em"
-            }}>Profile</h1>
+            }}>
+            {name || "Profile"}
+            <span style={{
+              fontSize: "1.13rem",
+              fontWeight: 400,
+              color: "#b794f6",
+              marginLeft: "1.2em"
+            }}>
+              {pronouns ? `(${pronouns})` : ""}
+            </span>
+          </h1>
 
           {/* Profile picture + name bubble (always top and wide) */}
           <section
@@ -264,7 +444,8 @@ function ProfileScreen() {
               borderRadius: 39,
               boxShadow: "0 5px 35px #b794f617, 0 4px 14px #ffd1dc19",
               marginBottom: "1.8em",
-              padding: "2.3em 2.2em"
+              padding: "2.3em 2.2em",
+              position: "relative"
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "2.1em", flexWrap: "wrap" }}>
@@ -490,9 +671,9 @@ function ProfileScreen() {
                   color="#e8daf9"
                   onClick={() => setMusic(opt.key)}
                 >
-                  <span style={{ marginRight: 6 }}>{{
-                    lofi: "🌙", rain: "🌧️", piano: "🎹", chillpop: "💿"
-                  }[opt.key]}</span>
+                  <span style={{ marginRight: 6 }}>{
+                    { lofi: "🌙", rain: "🌧️", piano: "🎹", chillpop: "💿" }[opt.key]
+                  }</span>
                   {opt.name}
                   {music === opt.key && <span style={{ fontSize: "1.1em", marginLeft: 7, filter: "blur(0.28px)" }}>🎵</span>}
                 </PastelRadioChip>
@@ -518,9 +699,9 @@ function ProfileScreen() {
                   color="#ffd1dccc"
                   onClick={() => setRoomScent(opt.key)}
                 >
-                  <span style={{ marginRight: 5 }}>{{
-                    lavender: "💜", vanilla: "🕯️", cotton: "🌥️", spring: "🌸"
-                  }[opt.key]}</span>
+                  <span style={{ marginRight: 5 }}>{
+                    { lavender: "💜", vanilla: "🕯️", cotton: "🌥️", spring: "🌸" }[opt.key]
+                  }</span>
                   {opt.label}
                 </PastelRadioChip>
               ))}
@@ -545,9 +726,9 @@ function ProfileScreen() {
                   color={opt.color}
                   onClick={() => setAesthetic(opt.key)}
                 >
-                  <span style={{ marginRight: 5 }}>{{
-                    fairy: "🧚‍♀️", pastel: "🌸", loungewear: "🛋️", cottage: "🌱"
-                  }[opt.key]}</span>
+                  <span style={{ marginRight: 5 }}>{
+                    { fairy: "🧚‍♀️", pastel: "🌸", loungewear: "🛋️", cottage: "🌱" }[opt.key]
+                  }</span>
                   {opt.label}
                 </PastelRadioChip>
               ))}
@@ -662,15 +843,59 @@ function ProfileScreen() {
           </section>
 
           {/* Save/Preview buttons - always full-width row */}
-          <section style={{ gridColumn: "span 2", display: "flex", gap: "1.2em", marginTop: 7, paddingLeft: 4 }}>
-            <SoftButton type="submit" style={{
-              background: "linear-gradient(95deg, #ffd1dc 81%, #b794f6 120%)",
-              color: "#fff", border: "none"
-            }}>Save Profile</SoftButton>
-            <SoftButton type="button" style={{
-              background: "linear-gradient(91deg, #c2e9fb 61%, #b794f6 180%)",
-              color: "#fff", border: "none"
-            }}>Preview</SoftButton>
+          <section style={{ gridColumn: "span 2", display: "flex", gap: "1.2em", marginTop: 7, paddingLeft: 4, position: "relative" }}>
+            <SoftButton
+              type="submit"
+              id="saveProfileBtn"
+              // Glows softly when unsaved changes exist
+              style={{
+                background: hasUnsavedChanges()
+                  ? "linear-gradient(95deg, #ffd1dc 81%, #b794f6 120%)"
+                  : "linear-gradient(90deg, #c2e9fb 65%, #ffd1dc 145%)",
+                color: "#fff",
+                border: "none",
+                boxShadow: hasUnsavedChanges()
+                  ? "0 0px 17px 5px #ffd1dc7a, 0 1.5px 10px #b794f648"
+                  : "0 3px 11px #ffd1dc20",
+                animation: hasUnsavedChanges() ? "glowProfileBtn 1.6s infinite alternate" : "none",
+                transition: "box-shadow .28s, background .18s"
+              }}
+              disabled={isSaved}
+            >
+              Save Profile
+              <FloatingSaveSparkles visible={showSparkle} />
+            </SoftButton>
+            <SoftButton type="button"
+              style={{
+                background: "linear-gradient(91deg, #c2e9fb 61%, #b794f6 180%)",
+                color: "#fff", border: "none"
+              }}>Preview</SoftButton>
+            {/* Saved message */}
+            <span
+              style={{
+                marginLeft: "1.2em",
+                color: "#b794f6",
+                fontSize: "0.98em",
+                fontWeight: 700,
+                opacity: isSaved ? 1 : 0,
+                transition: "opacity .33s",
+                boxShadow: isSaved ? "0 1px 18px #b794f648" : "none",
+                background: isSaved ? "#fff6fbcc" : "transparent",
+                borderRadius: "21px",
+                padding: isSaved ? "0.27em 0.88em" : "0"
+              }}
+              aria-live="polite"
+            >
+              Saved successfully 💾✨
+            </span>
+            <style>
+              {`
+                @keyframes glowProfileBtn {
+                  0% { box-shadow: 0 0px 13px 4px #ffd1dc99,0 2px 10px #b794f641;}
+                  100% { box-shadow: 0 0px 28px 9px #ffd1dc44, 0 3px 18px #b794f63b; }
+                }
+              `}
+            </style>
           </section>
         </form>
         {/* Gentle hint/info section divider */}
@@ -733,7 +958,6 @@ function ProfileScreen() {
             from { opacity: 0; transform: translateY(41px) scale(0.98);}
             to   { opacity: 1; transform: translateY(0) scale(1);}
           }
-          /* Responsive: grid collapses to 1 column on small screens */
           @media (max-width: 900px) {
             .profile-sections-grid { grid-template-columns: 1fr !important;}
           }
