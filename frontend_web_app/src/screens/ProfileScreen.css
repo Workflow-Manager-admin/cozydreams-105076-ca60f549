@@ -1,0 +1,67 @@
+.profile-floating-card {
+  background: var(--color-card);
+  border-radius: 36px;
+  box-shadow: 0 10px 40px #b794f630, 0 2px 18px #ffd1dc1a;
+  backdrop-filter: blur(23px) saturate(1.13);
+  padding: 2.7rem 2.7rem 2rem 2.7rem;
+  filter: drop-shadow(0 4px 46px #ffd1dc32);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2.5em auto;
+  position: relative;
+  z-index: 3;
+  transition: box-shadow 0.32s, transform 0.22s;
+}
+
+.profile-floating-card:hover,
+.profile-floating-card:focus-within {
+  box-shadow: 0 15px 57px #b794f646, 0 3.5px 25px #ffd1dc28;
+  transform: translateY(-2px) scale(1.01);
+}
+
+.profile-img-preview {
+  position: relative;
+}
+
+.pastel-chip {
+  appearance: none;
+  border: none;
+  background: #fffefa;
+  margin: 0 0.25em;
+  border-radius: 21px;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+  font-weight: 500;
+  transition: background 0.17s, color 0.14s, box-shadow 0.19s, transform 0.13s;
+  box-shadow: 0 0.5px 7px #ffd1dc14;
+  font-size: 1em;
+  padding: 0.6em 1.4em;
+}
+
+.pastel-chip:active {
+  background: #ffeaf7;
+  box-shadow: 0 1.6px 11px #b794f629;
+  transform: scale(0.98);
+}
+
+.gentle-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+}
+
+@media (max-width: 600px) {
+  .profile-floating-card {
+    padding: 1em 0.8em;
+    max-width: 98vw;
+  }
+}
+
+@keyframes floatProfileSpark {
+  0% { opacity: 0.2; transform: scale(1) translateY(0);}
+  39% { opacity: 0.64;}
+  69% { opacity: 1; transform: translateY(-19px);}
+  100% { opacity: 0.18; transform: scale(1) translateY(11px);}
+}
