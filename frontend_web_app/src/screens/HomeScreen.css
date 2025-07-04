@@ -1,0 +1,44 @@
+.decor-item {
+  cursor: grab;
+  outline: none;
+  box-shadow: 0 1px 8px #ffd1dc11;
+  background: transparent;
+  transition: box-shadow 0.13s, transform 0.15s;
+}
+.decor-item:focus-visible {
+  box-shadow: 0 8px 30px #ffd1dc66;
+  outline: 2.2px dashed #b794f6;
+}
+.decor-delete:hover, .decor-delete:focus {
+  background: #b794f6 !important;
+  color: #ffd1dc !important;
+  border: 1.5px solid #ffd1dc;
+}
+.floating-toolbar {
+  transition: box-shadow 0.22s, background 0.21s;
+  backdrop-filter: blur(9px);
+  pointer-events: auto;
+  user-select: none;
+}
+
+.toolbar-btn {
+  transition: background 0.14s, box-shadow 0.17s, transform 0.15s;
+  filter: none;
+}
+.toolbar-btn.active, .toolbar-btn:active {
+  background: #ffd1dc55;
+  border: 2.2px solid #b794f6;
+  transform: scale(1.09);
+}
+.avatar-area {
+  animation: avatarGlowFade 4.1s infinite alternate;
+}
+@keyframes avatarGlowFade {
+  0% { box-shadow: 0 0px 13px #ffd1dc33; }
+  100% { box-shadow: 0 6px 32px #b794f644; }
+}
+
+/* Soft UI for mood menu */
+.mood-menu-btn {
+  transition: background 0.19s, box-shadow 0.14s;
+}
