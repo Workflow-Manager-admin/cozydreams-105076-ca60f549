@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import "./ui/GlobalStyle.css";
 import theme from "./theme";
-import BottomNavBar from "./components/BottomNavBar";
-
 import HomeScreen from "./screens/HomeScreen";
 import JournalScreen from "./screens/JournalScreen";
 import ExploreScreen from "./screens/ExploreScreen";
 import ShopScreen from "./screens/ShopScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import SidebarNav from "./components/SidebarNav";
 
 /**
  * CozyDreams App Entry Point (SPA).
- * Applies pastel global theme and routes to main whimsical screens.
+ * Uses a dreamy vertical sidebar nav and routes to main whimsical screens.
  */
 // PUBLIC_INTERFACE
 function App() {
-  // Theme state (future: expand to support night/seasonal themes)
+  // Theme state
   const [appTheme, setAppTheme] = useState("light");
 
   useEffect(() => {
@@ -28,6 +27,7 @@ function App() {
     setAppTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
+  // Main layout with sidebar
   return (
     <Router>
       <button
@@ -45,18 +45,21 @@ function App() {
       >
         {appTheme === "light" ? "🌙 Dark" : "☀️ Light"}
       </button>
-      <div style={{ minHeight: "100vh", paddingBottom: "6.2rem", background: "var(--color-bg)" }}>
-        <Routes>
-          <Route path="/" element={<HomeScreen />} />
-          <Route path="/journal" element={<JournalScreen />} />
-          <Route path="/explore" element={<ExploreScreen />} />
-          <Route path="/shop" element={<ShopScreen />} />
-          <Route path="/profile" element={<ProfileScreen />} />
-        </Routes>
+      <div className="app-layout">
+        <SidebarNav />
+        <main className="main-content-float">
+          <Routes>
+            <Route path="/" element={<HomeScreen />} />
+            <Route path="/journal" element={<JournalScreen />} />
+            <Route path="/explore" element={<ExploreScreen />} />
+            <Route path="/shop" element={<ShopScreen />} />
+            <Route path="/profile" element={<ProfileScreen />} />
+          </Routes>
+        </main>
       </div>
-      <BottomNavBar />
     </Router>
   );
 }
 
 export default App;
+
