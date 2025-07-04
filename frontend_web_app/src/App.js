@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./ui/GlobalStyle.css";
 import theme from "./theme";
+import BottomNavBar from "./components/BottomNavBar";
+
+import HomeScreen from "./screens/HomeScreen";
+import JournalScreen from "./screens/JournalScreen";
+import ExploreScreen from "./screens/ExploreScreen";
+import ShopScreen from "./screens/ShopScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 
 /**
- * CozyDreams App Entry Point.
- * Applies pastel global theme and demonstrates foundational UI.
+ * CozyDreams App Entry Point (SPA).
+ * Applies pastel global theme and routes to main whimsical screens.
  */
 // PUBLIC_INTERFACE
 function App() {
@@ -12,7 +20,6 @@ function App() {
   const [appTheme, setAppTheme] = useState("light");
 
   useEffect(() => {
-    // Ready for future theme classes, currently "light" pastel only
     document.body.setAttribute("data-theme", appTheme);
   }, [appTheme]);
 
@@ -21,49 +28,34 @@ function App() {
     setAppTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  // Example: pastel card and whimsical type showcase
   return (
-    <div>
-      <div className="centered" style={{ minHeight: "100vh", background: "var(--color-bg)" }}>
-        <div className="floating-card">
-          <button
-            className="pastel-btn"
-            style={{ float: "right" }}
-            onClick={toggleTheme}
-            aria-label={`Switch to ${appTheme === "light" ? "dark" : "light"} mode`}
-          >
-            {appTheme === "light" ? "🌙 Dark" : "☀️ Light"}
-          </button>
-
-          <h1 className="whimsical" style={{ marginTop: 18 }}>
-            Welcome to <span style={{ color: "var(--color-primary)" }}>CozyDreams</span>
-          </h1>
-          <p style={{
-            fontSize: "1.09em",
-            color: "var(--color-text-secondary)",
-            margin: "0.45em 0 1em",
-            fontFamily: theme.fontFamily,
-            fontWeight: 400
-          }}>
-            Your dreamy, pastel, and gently whimsical world starts here.
-          </p>
-          <a
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontFamily: theme.fontFamily,
-              display: "inline-block",
-              marginTop: "1.3em",
-              fontWeight: 600,
-              fontSize: "1.03em"
-            }}
-          >
-            🌈 Learn React & Cozy UI
-          </a>
-        </div>
+    <Router>
+      <button
+        className="pastel-btn"
+        style={{
+          position: "fixed",
+          top: 18,
+          right: 24,
+          zIndex: 50,
+          fontSize: "1em",
+          boxShadow: "0 3px 12px #ffd1dc34",
+        }}
+        onClick={toggleTheme}
+        aria-label={`Switch to ${appTheme === "light" ? "dark" : "light"} mode`}
+      >
+        {appTheme === "light" ? "🌙 Dark" : "☀️ Light"}
+      </button>
+      <div style={{ minHeight: "100vh", paddingBottom: "6.2rem", background: "var(--color-bg)" }}>
+        <Routes>
+          <Route path="/" element={<HomeScreen />} />
+          <Route path="/journal" element={<JournalScreen />} />
+          <Route path="/explore" element={<ExploreScreen />} />
+          <Route path="/shop" element={<ShopScreen />} />
+          <Route path="/profile" element={<ProfileScreen />} />
+        </Routes>
       </div>
-    </div>
+      <BottomNavBar />
+    </Router>
   );
 }
 

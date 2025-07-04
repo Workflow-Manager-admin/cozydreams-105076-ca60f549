@@ -128,6 +128,31 @@ input:focus, textarea:focus {
   border-radius: 12px;
 }
 
+/* Floating screen wrapper for main views */
+.floating-screen {
+  margin: 2.3rem auto 6.4rem auto;
+  background: var(--color-card);
+  border-radius: calc(var(--border-radius) + 10px);
+  box-shadow: var(--card-shadow), 0 4px 24px #ffd1dc1a;
+  max-width: 420px;
+  min-height: 340px;
+  padding: 2.5rem 2rem 1.5rem 2rem;
+  text-align: center;
+  transition: box-shadow 0.21s, background 0.19s;
+  animation: floatCardIn 0.53s cubic-bezier(.51,1.32,.63,1.01) both;
+}
+
+@keyframes floatCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Utility class for alignment */
 .centered {
   display: flex;
