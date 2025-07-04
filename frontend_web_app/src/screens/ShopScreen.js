@@ -1,281 +1,335 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import './ShopScreen.css';
 
-/**
- * PUBLIC_INTERFACE
- * ShopScreen
- * Presents all shop grids/features in ultra-wide, floaty, pastel pastel rows and bubbles
- * using the entire content width—no boxed or centered cards, just gentle open sections,
- * floaty grids, and soft pastel dividers.
- */
-function ShopScreen() {
-  // Demo data - replace with backend/shop API later
-  const shopItems = [
-    { emoji: "🪴", name: "Plant Pot", price: 12 },
-    { emoji: "🖼️", name: "Pastel Poster", price: 15 },
-    { emoji: "🕯️", name: "Glowy Candle", price: 10 },
-    { emoji: "🛋️", name: "Comfy Sofa", price: 23 }
-  ];
+// Icon stubs (can replace with SVGs or images)
+const categoryIcons = {
+  "Room Decor": "🪞",
+  "Avatar Fashion": "🧚‍♀️",
+  "Themes": "🎨",
+  "Music": "🎵",
+  "Stickers": "✨",
+  "Mystery": "🎁",
+};
 
-  // Open, pastel, floaty row/section
-  function SectionBubble({ children, bg, border, style, className = "" }) {
-    return (
-      <section
-        className={`shop-section-bubble ${className}`}
-        style={{
-          background: bg || "linear-gradient(113deg, #fff8fd 91%, #ffd1dc17 140%)",
-          borderBottom: border ? `2.3px solid ${border}` : "2.15px solid #eee9f6",
-          borderRadius: 36,
-          boxShadow: "0 6px 32px #b794f625, 0 2px 13px #ffd1dc19",
-          margin: "2.5em auto 1em auto",
-          padding: "2.7em 2.2vw 1.7em 2.7vw",
-          width: "99vw",
-          maxWidth: 1440,
-          ...style,
-        }}
-      >
-        {children}
-      </section>
-    );
+// Example product data
+const CATEGORIES = [
+  { name: "Room Decor", icon: categoryIcons["Room Decor"], key: "decor" },
+  { name: "Avatar Fashion", icon: categoryIcons["Avatar Fashion"], key: "fashion" },
+  { name: "Themes", icon: categoryIcons["Themes"], key: "theme" },
+  { name: "Music", icon: categoryIcons["Music"], key: "music" },
+  { name: "Stickers", icon: categoryIcons["Stickers"], key: "stickers" },
+  { name: "Mystery", icon: categoryIcons["Mystery"], key: "mystery" },
+];
+
+// Example product catalogue with some locked/unlocked items.
+const PRODUCTS = [
+  { id: 1, name: "Fluffy Cloud Rug", category: "decor", price: 30, type: "Stars", image: "☁️", locked: false },
+  { id: 2, name: "Dreamy Drape", category: "decor", price: 45, type: "Stars", image: "🪡", locked: true, lockType:"journal", lockReq: 3, lockMsg: "Write 3 journal entries to unlock!" },
+  { id: 3, name: "Luna's Bed", category: "decor", price: 65, type: "Stars", image: "🛏️", locked: false },
+  { id: 4, name: "Pastel Wings", category: "fashion", price: 50, type: "Hearts", image: "🎀", locked: false },
+  { id: 5, name: "Cozy Sweater", category: "fashion", price: 80, type: "Hearts", image: "🧥", locked: true, lockType:"vibe", lockReq: "cozy", lockMsg: "Reach Cozy vibe to unlock!" },
+  { id: 6, name: "Sunbeam Theme", category: "theme", price: 100, type: "Stars", image: "🌞", locked: false },
+  { id: 7, name: "Gentle Rain", category: "music", price: 25, type: "Hearts", image: "💧", locked: false},
+  { id: 8, name: "Sleepy Bear Sticker", category: "stickers", price: 10, type: "Stars", image: "🐻", locked: false },
+  { id: 9, name: "Mystic Box", category: "mystery", price: 120, type: "Stars", image: "🦄", locked: true, lockType: "journal", lockReq: 10, lockMsg: "Write 10 journal entries to unlock!" }
+];
+
+// Inventory util for localStorage
+function loadInventory() {
+  try {
+    const data = JSON.parse(localStorage.getItem('shop-inventory') || '{}');
+    // Default values if not present
+    return {
+      stars: isNaN(Number(data.stars)) ? 200 : data.stars,
+      hearts: isNaN(Number(data.hearts)) ? 100 : data.hearts,
+      owned: Array.isArray(data.owned) ? data.owned : [],
+      journalEntries: isNaN(Number(data.journalEntries)) ? 0 : data.journalEntries,
+      vibe: typeof data.vibe === 'string' ? data.vibe : 'calm',
+    };
+  } catch {
+    return { stars: 200, hearts: 100, owned: [], journalEntries: 0, vibe: 'calm' };
+  }
+}
+
+function saveInventory(inv) {
+  localStorage.setItem('shop-inventory', JSON.stringify(inv));
+}
+
+//
+// MAIN COMPONENT
+//
+const ShopScreen = () => {
+  // Shop state
+  const [balance, setBalance] = useState({ stars: 0, hearts: 0 });
+  const [owned, setOwned] = useState([]);
+  const [selectedCat, setSelectedCat] = useState('all');
+  const [filter, setFilter] = useState('all');
+  const [sort, setSort] = useState('default');
+  const [showInventory, setShowInventory] = useState(false);
+  const [animatedConfirm, setAnimatedConfirm] = useState(null); // item id for animated purchase
+  const [modalConfirm, setModalConfirm] = useState(null); // object {item, state}
+  const [journalEntries, setJournalEntries] = useState(0);
+  const [vibe, setVibe] = useState('calm');
+
+  // INIT: Load from localStorage
+  useEffect(() => {
+    const inv = loadInventory();
+    setBalance({ stars: inv.stars, hearts: inv.hearts });
+    setOwned(inv.owned);
+    setJournalEntries(inv.journalEntries);
+    setVibe(inv.vibe);
+  }, []);
+
+  // SAVE to localStorage (debounce for rapid updates not needed here)
+  function saveAll(newBalance, newOwned) {
+    setBalance(newBalance);
+    setOwned(newOwned);
+    saveInventory({
+      stars: newBalance.stars,
+      hearts: newBalance.hearts,
+      owned: newOwned,
+      journalEntries,
+      vibe
+    });
   }
 
+  // Filtering and sorting products
+  let shownProducts = PRODUCTS
+    .filter(p => selectedCat === 'all' ? true : p.category === selectedCat)
+    .filter(p => filter === 'all' ? true : !p.locked)
+    .sort((a, b) => {
+      if (sort === 'cheapest') return a.price - b.price;
+      if (sort === 'mostexp') return b.price - a.price;
+      if (sort === 'alpha') return a.name.localeCompare(b.name);
+      return 0;
+    });
+
+  // Inventory: Open modal and animate
+  function openInventory() {
+    setShowInventory(true);
+  }
+
+  function closeInventory() {
+    setShowInventory(false);
+  }
+
+  // Purchase (handle lock, animation, confirmation)
+  function attemptPurchase(prod) {
+    if (owned.includes(prod.id)) return; // already owned
+
+    // Check if locked
+    if (prod.locked) {
+      if (prod.lockType === "journal" && journalEntries < prod.lockReq) {
+        setModalConfirm({item: prod, state: "locked"});
+        return;
+      }
+      if (prod.lockType === "vibe" && vibe !== prod.lockReq) {
+        setModalConfirm({item: prod, state: "locked"});
+        return;
+      }
+    }
+
+    // Check balance
+    if ((prod.type === "Stars" && balance.stars < prod.price) ||
+      (prod.type === "Hearts" && balance.hearts < prod.price)) {
+      setModalConfirm({item: prod, state: "notenough"});
+      return;
+    }
+
+    // Animate
+    setAnimatedConfirm(prod.id);
+    setTimeout(() => {
+      let newBalance = {...balance};
+      if (prod.type === "Stars") newBalance.stars -= prod.price;
+      if (prod.type === "Hearts") newBalance.hearts -= prod.price;
+      let newOwned = [...owned, prod.id];
+      saveAll(newBalance, newOwned);
+      setAnimatedConfirm(null);
+      setModalConfirm({item: prod, state: "success"});
+    }, 1200);
+  }
+
+  // Confirmation Modal Handler
+  function closeConfirmModal() {
+    setModalConfirm(null);
+  }
+
+  // Soft glass background behind content
   return (
-    <main
-      className="main-shop-dreamy"
-      style={{
-        background: "linear-gradient(120deg, #ffd1dc18 72%, #c2e9fb18 112%, #b794f617 151%)",
-        minHeight: "100vh",
-        width: "100%",
-        maxWidth: "none",
-        boxShadow: "none",
-        position: "relative",
-        display: "block",
-        padding: 0,
-        overflow: "visible",
-      }}
-    >
-      {/* Heading - open pastel bar */}
-      <SectionBubble
-        bg="linear-gradient(109deg, #ffd1dc66 76%, #c2e9fb33 130%, #fff8fd 230%)"
-        border="#ffd1dc"
-        style={{
-          margin: "clamp(2em,6vw,3.6em) auto 1.7em auto",
-          padding: "2.8em 2vw 1.95em 4vw",
-          borderRadius: 56,
-          boxShadow: "0 10px 38px #ffd1dc19, 0 2px 17px #b794f61c",
-        }}
-        className="shop-heading-bubble"
-      >
-        <h1
-          className="whimsical"
-          style={{
-            width: "100%",
-            textAlign: "left",
-            margin: 0,
-            fontSize: "2.6rem",
-            letterSpacing: "0.02em"
-          }}
-        >
-          🛍️ Shop
-        </h1>
-      </SectionBubble>
+    <div className="shop__glass-bg">
+      {/* Balance Bar */}
+      <div className="shop__balance-bar dreamy-glass">
+        <span className="shop__currency shop__stars">★ {balance.stars}</span>
+        <span className="shop__currency shop__hearts">❤ {balance.hearts}</span>
+        <button className="shop__inventory-btn floating" onClick={openInventory}>
+          <span role="img" aria-label="bag">👜</span> Inventory
+        </button>
+      </div>
+      {/* Magic Shop Title */}
+      <h1 className="shop__main-title pastel-rainbow">Dream Bazaar</h1>
 
-      {/* Gentle pastel divider */}
-      <div
-        aria-hidden="true"
-        style={{
-          height: 0,
-          border: 0,
-          borderBottom: "8px solid #c2e9fb33",
-          width: "84%",
-          maxWidth: 1220,
-          margin: "0 auto 0.8em auto",
-          borderRadius: 16,
-        }}
-      />
+      {/* Categories */}
+      <div className="shop__categories">
+        <button className={selectedCat === 'all' ? "active-cat dreamy-glass" : "dreamy-glass"}
+          onClick={() => setSelectedCat('all')}>✨ All</button>
+        {CATEGORIES.map(cat => (
+          <button key={cat.key}
+                  className={selectedCat === cat.key ? "active-cat dreamy-glass" : "dreamy-glass"}
+                  onClick={() => setSelectedCat(cat.key)}>
+            <span className="cat__icon">{cat.icon}</span> {cat.name}
+          </button>
+        ))}
+      </div>
+      {/* Soft Filters */}
+      <div className="shop__filters">
+        <label>
+          <span role="img" aria-label="filter">🔮</span>
+          <select
+            className="magic-select"
+            value={filter}
+            onChange={e => setFilter(e.target.value)}>
+            <option value="all">All</option>
+            <option value="unlocked">Only Unlocked</option>
+          </select>
+        </label>
+        <label>
+          <span role="img" aria-label="sort">🪐</span>
+          <select
+            className="magic-select"
+            value={sort}
+            onChange={e => setSort(e.target.value)}>
+            <option value="default">Featured</option>
+            <option value="cheapest">Cheapest</option>
+            <option value="mostexp">Most Expensive</option>
+            <option value="alpha">A-Z</option>
+          </select>
+        </label>
+      </div>
 
-      {/* Product grid row - floaty, stretch grid */}
-      <SectionBubble
-        bg="linear-gradient(108deg, #c2e9fb5d 83%, #ffd1dc39 164%)"
-        border="#b794f6"
-        style={{
-          margin: "0.8em auto 1.3em auto",
-          padding: "2.6em 0.7vw 2.6em 0.7vw",
-          borderRadius: 44,
-        }}
-        className="shop-products-row"
-      >
-        <div
-          style={{
-            display: "grid",
-            width: "100%",
-            gridTemplateColumns: "repeat(auto-fit, minmax(245px, 1fr))",
-            gap: "2.5em 3.7em",
-            alignItems: "stretch",
-            margin: "0 auto",
-            padding: 0,
-            maxWidth: 1200,
-            minWidth: 220,
-          }}
-        >
-          {shopItems.map((item, n) => (
+      {/* Product Cards */}
+      <div className="shop__product-grid floating-bg">
+        {shownProducts.map(prod => {
+          const ownedItem = owned.includes(prod.id);
+          const lockedItem = prod.locked && ((prod.lockType === "journal" && journalEntries < prod.lockReq) ||
+                                             (prod.lockType === "vibe" && vibe !== prod.lockReq));
+          return (
             <div
-              key={n}
-              className="shop-item-float"
-              style={{
-                background: "linear-gradient(119deg, #ffd1dc 90%, #c2e9fb 145%)",
-                borderRadius: 27,
-                boxShadow: "0 6px 34px #ffd1dc23, 0 3px 14px #b794f62b",
-                padding: "2.2em 1.1em 1.5em 1.1em",
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: 140,
-                transition: "box-shadow .21s, transform .17s",
-              }}
-              tabIndex={0}
+              key={prod.id}
+              className={`
+                dreamy-glass shop__product-card 
+                ${ownedItem ? "owned" : ""}
+                ${lockedItem ? "locked" : ""}
+                ${animatedConfirm === prod.id ? "purchase-animate" : ""}
+              `}
+              onClick={() => !ownedItem && !lockedItem && animatedConfirm !== prod.id && attemptPurchase(prod)}
             >
-              <span
-                style={{
-                  fontSize: "3em",
-                  marginBottom: "0.12em",
-                  filter: "drop-shadow(0 2px 13px #ffd1dc55) drop-shadow(0 2px 8px #b794f679)",
-                  letterSpacing: "-0.08em"
-                }}
-                role="img"
-                aria-label="shop item"
-              >
-                {item.emoji}
-              </span>
-              <div
-                style={{
-                  color: "#b794f6",
-                  fontSize: "1.21em",
-                  fontWeight: 700,
-                  fontFamily: "'Poppins', cursive",
-                  marginBottom: "6px",
-                  letterSpacing: "0.03em",
-                }}
-              >
-                {item.name}
+              <div className="shop__product-img">{prod.image}</div>
+              <div className="shop__product-name">{prod.name}</div>
+              <div className="shop__product-price">
+                {prod.type === "Stars" ? <span className="shop__stars">★ {prod.price}</span> : <span className="shop__hearts">❤ {prod.price}</span>}
               </div>
-              <div
-                style={{
-                  fontSize: "1.03em",
-                  color: "#8a7fae",
-                  fontWeight: 500,
-                  marginTop: 2,
-                  opacity: 0.89,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.27em"
-                }}
-              >
-                {item.price}
-                <span
-                  role="img"
-                  aria-label="hearts"
-                  style={{
-                    fontSize: "1.29em",
-                    marginLeft: 6,
-                    verticalAlign: "middle"
-                  }}
-                >💖</span>
-              </div>
+              {ownedItem &&
+                <div className="shop__product-owned float-badge">Owned</div>
+              }
+              {lockedItem && (
+                <div className="shop__product-locked float-badge">{prod.lockMsg}</div>
+              )}
+              {/* Magical Animation Sparkle */}
+              {animatedConfirm === prod.id && (
+                <div className="shop__purchase-sparkle">
+                  <span role="img" aria-label="sparkle">✨</span>
+                </div>
+              )}
+              <div className="shop__product-hover-sparkle"></div>
             </div>
-          ))}
+          );
+        })}
+        {/* If no products */}
+        {shownProducts.length === 0 && (
+          <div className="shop__empty-msg">
+            <span role="img" aria-label="empty">🌈</span> Nothing here! Try another category.
+          </div>
+        )}
+      </div>
+
+      {/* Magical Inventory Modal */}
+      {showInventory &&
+        <FloatingInventoryModal
+          products={PRODUCTS}
+          owned={owned}
+          onClose={closeInventory}
+        />
+      }
+
+      {/* Magical Purchase Confirmation/Failure Modal */}
+      {modalConfirm &&
+        <ConfirmModal
+          modal={modalConfirm}
+          onClose={closeConfirmModal}
+        />
+      }
+    </div>
+  );
+};
+
+// Inventory Modal Component
+function FloatingInventoryModal({ products, owned, onClose }) {
+  // Animated modal with sparkly pastel float
+  return (
+    <div className="shop__modal-overlay" tabIndex={-1} onClick={onClose}>
+      <div className="shop__modal dreamy-glass inventory-modal floating" onClick={e => e.stopPropagation()}>
+        <h2 className="pastel-rainbow">Your Magical Inventory</h2>
+        <div className="modal__owned-grid">
+          {products.filter(p => owned.includes(p.id)).length === 0 && (
+            <div className="modal__empty">
+              <span role="img" aria-label="sparkle">🔒</span> No items yet! Buy something cute!
+            </div>
+          )}
+          {products.filter(p => owned.includes(p.id)).map(p =>
+            <div className="modal__owned-item dreamy-glass" key={p.id}>
+              <div className="owned__img">{p.image}</div>
+              <div className="owned__name">{p.name}</div>
+            </div>
+          )}
         </div>
-      </SectionBubble>
+        <button className="modal__close-btn floating" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  );
+}
 
-      {/* Gentle section divider */}
-      <div
-        aria-hidden="true"
-        style={{
-          height: 0,
-          border: 0,
-          borderBottom: "7px solid #ffd1dc33",
-          width: "80%",
-          maxWidth: 1190,
-          margin: "0.1em auto 1em auto",
-          borderRadius: 14,
-        }}
-      />
-
-      {/* Info row - floaty bubble */}
-      <SectionBubble
-        bg="linear-gradient(110deg, #ffeaf7b0 79%, #ffd1dc66 120%, #fff6fa 140%)"
-        border="#ffd1dc"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "1.4em",
-          margin: "1.35em auto 3.6em auto",
-          textAlign: "center",
-          fontSize: "1.14em",
-          color: "#8a7fae",
-          fontFamily: "'Poppins', cursive",
-          fontWeight: 500,
-          minHeight: 40,
-        }}
-        className="shop-info-bubble"
-      >
-        Cozy decor and dreamy extras to unlock — all pastel and magical!
-      </SectionBubble>
-
-      {/* Custom pastel style for open floaty rows, max-width grids, and pastel dividers */}
-      <style>
-        {`
-        .shop-section-bubble {
-          width: 100vw;
-          max-width: 1460px;
-          margin: 2.3em auto 1.3em auto;
-          box-sizing: border-box;
-          transition: box-shadow .17s, background .13s, border-bottom .12s;
-          animation: bubbleFloatIn 1.11s cubic-bezier(.63,1.13,.47,0.95);
-          will-change: opacity, transform;
-        }
-        .shop-heading-bubble {
-          margin-top: clamp(2em,6vw,3.6em) !important;
-          border-radius: 66px !important;
-        }
-        .shop-products-row {
-          padding-left: 0vw !important; padding-right: 0vw !important;
-        }
-        .shop-item-float:focus, .shop-item-float:hover {
-          box-shadow: 0 15px 36px #b794f647, 0 3px 26px #ffd1dc1e !important;
-          transform: scale(1.045);
-          outline: none;
-          z-index: 12;
-        }
-        @media (max-width: 1500px) {
-          .shop-section-bubble { max-width: 99vw; }
-        }
-        @media (max-width: 1100px) {
-          .shop-section-bubble { max-width: 99vw; }
-        }
-        @media (max-width: 900px) {
-          .shop-section-bubble { width: 99vw; min-width: 0;}
-          .shop-products-row > div { gap: 1.5em 0.7em; }
-        }
-        @media (max-width: 700px) {
-          .shop-section-bubble { padding-left: 0.7em; padding-right: 0.7em; }
-        }
-        @media (max-width: 565px) {
-          .shop-section-bubble { padding: 1em 2vw 1em 2vw !important; }
-        }
-        @media (max-width: 450px) {
-          .shop-products-row > div { grid-template-columns: 1fr; }
-        }
-        @keyframes bubbleFloatIn {
-          from { opacity: 0; transform: translateY(32px) scale(0.97);}
-          to   { opacity: 1; transform: translateY(0) scale(1);}
-        }
-        `}
-      </style>
-    </main>
+// Magical Confirmation Modal
+function ConfirmModal({ modal, onClose }) {
+  const { item, state } = modal;
+  let content;
+  if (state === "success") {
+    content = (
+      <>
+        <div className="confirm__sparkle">✨</div>
+        <p className="pastel-rainbow">You've unlocked <b>{item.name}</b>!</p>
+      </>
+    );
+  } else if (state === "locked") {
+    content = (
+      <>
+        <div className="confirm__sparkle-lock">🔒</div>
+        <p>{item.lockMsg}</p>
+      </>
+    );
+  } else if (state === "notenough") {
+    content = (
+      <>
+        <p style={{color: "#E57373"}}>Not enough {item.type === "Stars" ? "Stars ★" : "Hearts ❤"}!</p>
+      </>
+    );
+  }
+  return (
+    <div className="shop__modal-overlay" tabIndex={-1} onClick={onClose}>
+      <div className="shop__modal dreamy-glass confirm-modal magical" onClick={e => e.stopPropagation()}>
+        {content}
+        <button className="modal__close-btn floating" onClick={onClose}>Close</button>
+      </div>
+    </div>
   );
 }
 
