@@ -8,7 +8,7 @@ import ExploreScreen from "./screens/ExploreScreen";
 import ShopScreen from "./screens/ShopScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SidebarNav from "./components/SidebarNav";
-
+import MusicScreen from "./screens/MusicScreen";
 /**
  * CozyDreams App Entry Point (SPA).
  * Uses a dreamy vertical sidebar nav and routes to main whimsical screens.
@@ -25,7 +25,7 @@ function App() {
             <Route path="/" element={<HomeScreen />} />
             <Route path="/my-room" element={<HomeScreen />} /> {/* My Room uses HomeScreen for now */}
             <Route path="/journal" element={<JournalScreen />} />
-            <Route path="/music" element={<ExploreScreen />} /> {/* Music nav temporarily routes to ExploreScreen; adjust as MusicScreen is added */}
+            <Route path="/music" element={<MusicScreen />} /> {/* Music nav now routes to dreamy Mood Quiz */}
             <Route path="/shop" element={<ShopScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
           </Routes>

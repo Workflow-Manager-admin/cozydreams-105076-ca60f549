@@ -207,3 +207,60 @@ input:focus, textarea:focus {
   .floating-card { padding: 1rem; }
   h1 { font-size: 1.4rem; }
 }
+
+/* Dreamy floating quiz cards for MusicScreen */
+.dreamy-quiz-step,
+.dreamy-quiz-results {
+  transition: box-shadow 0.27s, background 0.23s, opacity 0.18s;
+  will-change: opacity, transform;
+}
+.dreamy-quiz-step {
+  animation: dreamyQuizFadeIn 1.08s cubic-bezier(.67,1.09,.44,1.08);
+}
+.dreamy-quiz-results {
+  animation: dreamyResultFade 1.14s cubic-bezier(.57,1.09,.44,1.08);
+}
+
+@keyframes dreamyQuizFadeIn {
+  from { opacity: 0; transform: translateY(32px) scale(.96);}
+  to   { opacity: 1; transform: translateY(0) scale(1);}
+}
+@keyframes dreamyResultFade {
+  from { opacity: 0; transform: translateY(45px) scale(.95);}
+  to   { opacity: 1; transform: translateY(0) scale(1);}
+}
+
+/* Glowing pastel option chip for quiz/mood/music */
+.dreamy-chip-btn {
+  background: #fff;
+  border: 1.8px solid #eee9f6;
+  border-radius: 31px;
+  box-shadow: 0 1px 8px #ffd1dc16;
+  color: #8a7fae;
+  font-family: 'Poppins', cursive;
+  font-size: 1.09em;
+  font-weight: 600;
+  padding: 0.64em 1.4em;
+  filter: none;
+  transition: background 0.19s, box-shadow 0.13s, color 0.19s, border 0.16s, transform 0.16s;
+  outline: none;
+}
+.dreamy-chip-btn:active {
+  background: #ffeaf7;
+  color: #b794f6;
+  transform: scale(0.97);
+  box-shadow: 0 1.6px 11px #b794f629;
+}
+.dreamy-chip-btn:focus, .dreamy-chip-btn:hover {
+  background: linear-gradient(91deg, #ffd1dc, #b794f6 120%);
+  color: #fff !important;
+  outline: none;
+  border: 2.2px solid #ffd1dc !important;
+  box-shadow: 0 3px 19px #ffd1dc6e;
+  transform: scale(1.06);
+}
+
+/* Quiz Results cards float in gently */
+.quiz-results-card {
+  animation: dreamyResultFade 1.12s;
+}
