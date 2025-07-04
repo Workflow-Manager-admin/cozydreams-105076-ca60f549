@@ -9,6 +9,4 @@
 
 /* Minimal legacy overrides; prefer src/ui/GlobalStyle.css going forward */
 
-.App {
-  text-align: center;
-}
+/* .App { text-align: center; } */

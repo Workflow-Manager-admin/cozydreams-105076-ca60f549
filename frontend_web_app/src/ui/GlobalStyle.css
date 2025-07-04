@@ -143,14 +143,18 @@ input:focus, textarea:focus {
   flex: 1 1 0%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  background: var(--color-bg);
+  align-items: stretch;
+  justify-content: stretch;
+  background: linear-gradient(120deg, var(--color-bg) 80%, #ffeaf7 120%);
   min-height: 100vh;
+  height: 100vh;
   width: 100%;
   transition: margin-left 0.23s;
   position: relative;
   z-index: 1;
+  box-shadow: none;
+  overflow-x: auto;
+  /* Remove all previous centering -- make it stretch edge to edge */
 }
 
 @media (max-width: 700px) {

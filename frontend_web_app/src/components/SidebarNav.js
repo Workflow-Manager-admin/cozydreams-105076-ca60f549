@@ -4,8 +4,9 @@ import "./SidebarNav.css";
 
 const navTabs = [
   { path: "/", label: "Home", emoji: "🏠" },
+  { path: "/my-room", label: "My Room", emoji: "🛌" }, // Pastel bed icon for cozy 'room'
   { path: "/journal", label: "Journal", emoji: "📒" },
-  { path: "/explore", label: "Explore", emoji: "🔍" },
+  { path: "/music", label: "Music", emoji: "🎵" },    // Replaces 'Explore' with Music
   { path: "/shop", label: "Shop", emoji: "🛍️" },
   { path: "/profile", label: "Profile", emoji: "🧑‍🎤" },
 ];

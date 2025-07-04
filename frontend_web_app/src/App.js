@@ -50,8 +50,9 @@ function App() {
         <main className="main-content-float">
           <Routes>
             <Route path="/" element={<HomeScreen />} />
+            <Route path="/my-room" element={<HomeScreen />} /> {/* My Room uses HomeScreen for now */}
             <Route path="/journal" element={<JournalScreen />} />
-            <Route path="/explore" element={<ExploreScreen />} />
+            <Route path="/music" element={<ExploreScreen />} /> {/* Music nav temporarily routes to ExploreScreen; adjust as MusicScreen is added */}
             <Route path="/shop" element={<ShopScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
           </Routes>
