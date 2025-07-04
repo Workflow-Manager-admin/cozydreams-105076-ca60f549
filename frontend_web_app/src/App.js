@@ -1,47 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./ui/GlobalStyle.css";
+import theme from "./theme";
 
+/**
+ * CozyDreams App Entry Point.
+ * Applies pastel global theme and demonstrates foundational UI.
+ */
 // PUBLIC_INTERFACE
 function App() {
-  const [theme, setTheme] = useState('light');
+  // Theme state (future: expand to support night/seasonal themes)
+  const [appTheme, setAppTheme] = useState("light");
 
-  // Effect to apply theme to document element
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+    // Ready for future theme classes, currently "light" pastel only
+    document.body.setAttribute("data-theme", appTheme);
+  }, [appTheme]);
 
   // PUBLIC_INTERFACE
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    setAppTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
+  // Example: pastel card and whimsical type showcase
   return (
-    <div className="App">
-      <header className="App-header">
-        <button 
-          className="theme-toggle" 
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          Current theme: <strong>{theme}</strong>
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div className="centered" style={{ minHeight: "100vh", background: "var(--color-bg)" }}>
+        <div className="floating-card">
+          <button
+            className="pastel-btn"
+            style={{ float: "right" }}
+            onClick={toggleTheme}
+            aria-label={`Switch to ${appTheme === "light" ? "dark" : "light"} mode`}
+          >
+            {appTheme === "light" ? "🌙 Dark" : "☀️ Light"}
+          </button>
+
+          <h1 className="whimsical" style={{ marginTop: 18 }}>
+            Welcome to <span style={{ color: "var(--color-primary)" }}>CozyDreams</span>
+          </h1>
+          <p style={{
+            fontSize: "1.09em",
+            color: "var(--color-text-secondary)",
+            margin: "0.45em 0 1em",
+            fontFamily: theme.fontFamily,
+            fontWeight: 400
+          }}>
+            Your dreamy, pastel, and gently whimsical world starts here.
+          </p>
+          <a
+            href="https://reactjs.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontFamily: theme.fontFamily,
+              display: "inline-block",
+              marginTop: "1.3em",
+              fontWeight: 600,
+              fontSize: "1.03em"
+            }}
+          >
+            🌈 Learn React & Cozy UI
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
