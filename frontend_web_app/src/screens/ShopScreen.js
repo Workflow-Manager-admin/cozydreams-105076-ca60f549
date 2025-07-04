@@ -3,13 +3,12 @@ import React from "react";
 /**
  * PUBLIC_INTERFACE
  * ShopScreen
- * Fully open, airy, floaty layout: presents product grid and shop features
- * in ultra-wide, pastel bubble/row sections spanning the available horizontal space.
- * All boxes/centering removed; responsive, visually "floaty", pastel section
- * dividers between each row as gentle color transitions.
+ * Presents all shop grids/features in ultra-wide, floaty, pastel pastel rows and bubbles
+ * using the entire content width—no boxed or centered cards, just gentle open sections,
+ * floaty grids, and soft pastel dividers.
  */
 function ShopScreen() {
-  // Future: replace with fetched shop data (for now hardcoded)
+  // Demo data - replace with backend/shop API later
   const shopItems = [
     { emoji: "🪴", name: "Plant Pot", price: 12 },
     { emoji: "🖼️", name: "Pastel Poster", price: 15 },
@@ -17,7 +16,7 @@ function ShopScreen() {
     { emoji: "🛋️", name: "Comfy Sofa", price: 23 }
   ];
 
-  // Wide pastel row/bubble (open layout)
+  // Open, pastel, floaty row/section
   function SectionBubble({ children, bg, border, style, className = "" }) {
     return (
       <section
@@ -25,12 +24,12 @@ function ShopScreen() {
         style={{
           background: bg || "linear-gradient(113deg, #fff8fd 91%, #ffd1dc17 140%)",
           borderBottom: border ? `2.3px solid ${border}` : "2.15px solid #eee9f6",
-          borderRadius: 34,
-          boxShadow: "0 5px 19px #ffd1dc13, 0 2px 10px #c2e9fb17",
-          margin: "2.3em auto 0.9em auto",
-          padding: "2.4em 1.9em 1.8em 2.5em",
-          width: "100vw",
-          maxWidth: 1380,
+          borderRadius: 36,
+          boxShadow: "0 6px 32px #b794f625, 0 2px 13px #ffd1dc19",
+          margin: "2.5em auto 1em auto",
+          padding: "2.7em 2.2vw 1.7em 2.7vw",
+          width: "99vw",
+          maxWidth: 1440,
           ...style,
         }}
       >
@@ -43,7 +42,7 @@ function ShopScreen() {
     <main
       className="main-shop-dreamy"
       style={{
-        background: "linear-gradient(118deg, #ffd1dc18 65%, #c2e9fb19 117%, #b794f617 155%)",
+        background: "linear-gradient(120deg, #ffd1dc18 72%, #c2e9fb18 112%, #b794f617 151%)",
         minHeight: "100vh",
         width: "100%",
         maxWidth: "none",
@@ -54,17 +53,15 @@ function ShopScreen() {
         overflow: "visible",
       }}
     >
-      {/* Pastel particles and ambient animation would be here if desired */}
-
-      {/* Shop heading as an airy floaty pastel row */}
+      {/* Heading - open pastel bar */}
       <SectionBubble
-        bg="linear-gradient(110deg, #ffd1dc33 81%, #fff8fd 120%)"
+        bg="linear-gradient(109deg, #ffd1dc66 76%, #c2e9fb33 130%, #fff8fd 230%)"
         border="#ffd1dc"
         style={{
-          margin: "clamp(2em,5vw,3.6em) auto 1.2em auto",
-          padding: "2.15em 0em 1.7em 4vw",
-          borderRadius: 48,
-          boxShadow: "0 9.5px 40px #ffd1dc16, 0 2px 15px #b794f612",
+          margin: "clamp(2em,6vw,3.6em) auto 1.7em auto",
+          padding: "2.8em 2vw 1.95em 4vw",
+          borderRadius: 56,
+          boxShadow: "0 10px 38px #ffd1dc19, 0 2px 17px #b794f61c",
         }}
         className="shop-heading-bubble"
       >
@@ -74,92 +71,91 @@ function ShopScreen() {
             width: "100%",
             textAlign: "left",
             margin: 0,
-            fontSize: "2.4rem",
+            fontSize: "2.6rem",
+            letterSpacing: "0.02em"
           }}
         >
           🛍️ Shop
         </h1>
       </SectionBubble>
 
-      {/* Pastel divider */}
+      {/* Gentle pastel divider */}
       <div
         aria-hidden="true"
         style={{
           height: 0,
           border: 0,
-          borderBottom: "5px solid #c2e9fb29",
-          width: "82%",
-          maxWidth: 1180,
-          margin: "0 auto 0.5em auto",
-          borderRadius: 11,
+          borderBottom: "8px solid #c2e9fb33",
+          width: "84%",
+          maxWidth: 1220,
+          margin: "0 auto 0.8em auto",
+          borderRadius: 16,
         }}
-      ></div>
+      />
 
-      {/* Product grid - full-width, open pastel bubble/row */}
+      {/* Product grid row - floaty, stretch grid */}
       <SectionBubble
-        bg="linear-gradient(109deg, #c2e9fb4c 95%, #ffd1dc26 145%)"
+        bg="linear-gradient(108deg, #c2e9fb5d 83%, #ffd1dc39 164%)"
         border="#b794f6"
         style={{
-          margin: "0.7em auto 0.8em auto",
-          padding: "2.85em 2vw 2em 3vw",
-          borderRadius: 38,
+          margin: "0.8em auto 1.3em auto",
+          padding: "2.6em 0.7vw 2.6em 0.7vw",
+          borderRadius: 44,
         }}
-        className="shop-products-bubble"
+        className="shop-products-row"
       >
         <div
           style={{
-            width: "100%",
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "2.5em 3.1em",
-            justifyContent: "center",
+            width: "100%",
+            gridTemplateColumns: "repeat(auto-fit, minmax(245px, 1fr))",
+            gap: "2.5em 3.7em",
             alignItems: "stretch",
             margin: "0 auto",
-            padding: "0.5em 1vw",
+            padding: 0,
+            maxWidth: 1200,
+            minWidth: 220,
           }}
         >
           {shopItems.map((item, n) => (
             <div
               key={n}
+              className="shop-item-float"
               style={{
-                background: "linear-gradient(121deg, #ffd1dc 79%, #c2e9fb 120%)",
-                borderRadius: 24,
-                boxShadow: "0 6px 23px #ffd1dc27, 0 3px 13px #b794f61c",
-                padding: "2.13em 0.9em 1.3em 0.9em",
+                background: "linear-gradient(119deg, #ffd1dc 90%, #c2e9fb 145%)",
+                borderRadius: 27,
+                boxShadow: "0 6px 34px #ffd1dc23, 0 3px 14px #b794f62b",
+                padding: "2.2em 1.1em 1.5em 1.1em",
                 textAlign: "center",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                width: "98%",
-                maxWidth: 330,
-                minHeight: 122,
-                transition: "box-shadow 0.21s, transform 0.15s",
-                margin: "0 auto",
+                minHeight: 140,
+                transition: "box-shadow .21s, transform .17s",
               }}
               tabIndex={0}
-              className="shop-item-card"
             >
-              <div style={{ paddingBottom: "0.35em" }}>
-                <span
-                  style={{
-                    fontSize: "2.7em",
-                    filter: "drop-shadow(0 2px 11px #ffd1dc53) drop-shadow(0 2px 8px #b794f677)",
-                  }}
-                  role="img"
-                  aria-label="shop item"
-                >
-                  {item.emoji}
-                </span>
-              </div>
+              <span
+                style={{
+                  fontSize: "3em",
+                  marginBottom: "0.12em",
+                  filter: "drop-shadow(0 2px 13px #ffd1dc55) drop-shadow(0 2px 8px #b794f679)",
+                  letterSpacing: "-0.08em"
+                }}
+                role="img"
+                aria-label="shop item"
+              >
+                {item.emoji}
+              </span>
               <div
                 style={{
                   color: "#b794f6",
-                  fontSize: "1.17em",
+                  fontSize: "1.21em",
                   fontWeight: 700,
                   fontFamily: "'Poppins', cursive",
-                  marginBottom: 3,
-                  letterSpacing: "0.04em",
+                  marginBottom: "6px",
+                  letterSpacing: "0.03em",
                 }}
               >
                 {item.name}
@@ -170,7 +166,7 @@ function ShopScreen() {
                   color: "#8a7fae",
                   fontWeight: 500,
                   marginTop: 2,
-                  opacity: 0.90,
+                  opacity: 0.89,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -178,41 +174,47 @@ function ShopScreen() {
                 }}
               >
                 {item.price}
-                <span role="img" aria-label="hearts" style={{ fontSize: "1.19em" }}>
-                  💖
-                </span>
+                <span
+                  role="img"
+                  aria-label="hearts"
+                  style={{
+                    fontSize: "1.29em",
+                    marginLeft: 6,
+                    verticalAlign: "middle"
+                  }}
+                >💖</span>
               </div>
             </div>
           ))}
         </div>
       </SectionBubble>
 
-      {/* Section divider - pastel line bubble */}
+      {/* Gentle section divider */}
       <div
         aria-hidden="true"
         style={{
           height: 0,
           border: 0,
-          borderBottom: "4.5px solid #ffd1dc22",
-          width: "78%",
-          maxWidth: 1110,
-          margin: "0em auto 0.9em auto",
-          borderRadius: 9,
+          borderBottom: "7px solid #ffd1dc33",
+          width: "80%",
+          maxWidth: 1190,
+          margin: "0.1em auto 1em auto",
+          borderRadius: 14,
         }}
-      ></div>
+      />
 
-      {/* Shop info secondary row - open pastel bubble */}
+      {/* Info row - floaty bubble */}
       <SectionBubble
-        bg="linear-gradient(109deg, #ffeaf7 81%, #ffd1dc44 120%, #fff6fa 170%)"
+        bg="linear-gradient(110deg, #ffeaf7b0 79%, #ffd1dc66 120%, #fff6fa 140%)"
         border="#ffd1dc"
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "1.2em",
-          margin: "1.1em auto 3.1em auto",
+          gap: "1.4em",
+          margin: "1.35em auto 3.6em auto",
           textAlign: "center",
-          fontSize: "1.13em",
+          fontSize: "1.14em",
           color: "#8a7fae",
           fontFamily: "'Poppins', cursive",
           fontWeight: 500,
@@ -223,49 +225,52 @@ function ShopScreen() {
         Cozy decor and dreamy extras to unlock — all pastel and magical!
       </SectionBubble>
 
-      {/* Final pastel style for fully open, airy sections */}
+      {/* Custom pastel style for open floaty rows, max-width grids, and pastel dividers */}
       <style>
         {`
         .shop-section-bubble {
-          width: 99vw;
-          max-width: 1400px;
-          margin: 2.2em auto 1em auto;
+          width: 100vw;
+          max-width: 1460px;
+          margin: 2.3em auto 1.3em auto;
           box-sizing: border-box;
-          transition: box-shadow .18s, background .11s, border-bottom .15s;
+          transition: box-shadow .17s, background .13s, border-bottom .12s;
           animation: bubbleFloatIn 1.11s cubic-bezier(.63,1.13,.47,0.95);
           will-change: opacity, transform;
         }
-        .shop-products-bubble {
-          margin: 0.78em auto 1.3em auto;
-          padding-left: 0vw; padding-right: 0vw;
+        .shop-heading-bubble {
+          margin-top: clamp(2em,6vw,3.6em) !important;
+          border-radius: 66px !important;
         }
-        @media (max-width: 1450px) {
+        .shop-products-row {
+          padding-left: 0vw !important; padding-right: 0vw !important;
+        }
+        .shop-item-float:focus, .shop-item-float:hover {
+          box-shadow: 0 15px 36px #b794f647, 0 3px 26px #ffd1dc1e !important;
+          transform: scale(1.045);
+          outline: none;
+          z-index: 12;
+        }
+        @media (max-width: 1500px) {
           .shop-section-bubble { max-width: 99vw; }
         }
         @media (max-width: 1100px) {
           .shop-section-bubble { max-width: 99vw; }
         }
         @media (max-width: 900px) {
-          .shop-section-bubble { width: 98vw; min-width: 0;}
-          .shop-products-bubble { gap: 1.7em 1em;}
+          .shop-section-bubble { width: 99vw; min-width: 0;}
+          .shop-products-row > div { gap: 1.5em 0.7em; }
         }
         @media (max-width: 700px) {
           .shop-section-bubble { padding-left: 0.7em; padding-right: 0.7em; }
         }
-        @media (max-width: 540px) {
-          .shop-section-bubble { padding: 1em 1vw 1em 1vw; }
+        @media (max-width: 565px) {
+          .shop-section-bubble { padding: 1em 2vw 1em 2vw !important; }
         }
-        @media (max-width: 490px) {
-          .shop-products-bubble { grid-template-columns: 1fr; }
-        }
-        .shop-item-card:focus, .shop-item-card:hover {
-          box-shadow: 0 13px 32px #b794f647, 0 2px 20px #ffd1dc1b !important;
-          transform: scale(1.035);
-          outline: none;
-          z-index: 11;
+        @media (max-width: 450px) {
+          .shop-products-row > div { grid-template-columns: 1fr; }
         }
         @keyframes bubbleFloatIn {
-          from { opacity: 0; transform: translateY(29px) scale(0.97);}
+          from { opacity: 0; transform: translateY(32px) scale(0.97);}
           to   { opacity: 1; transform: translateY(0) scale(1);}
         }
         `}
