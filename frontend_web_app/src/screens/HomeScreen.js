@@ -3,6 +3,81 @@ import { theme } from "../theme";
 import "./../ui/GlobalStyle.css";
 import "./HomeScreen.css";
 
+// Dreamy poetic welcome/about lines or daily whisper (rotates by day)
+const INTRO_WHISPERS = [
+  "No matter what the world brings, this is your gentle sky — you are safe & seen here.✨",
+  "Welcome home. In this soft space, even your smallest dreams are starlight.",
+  "Every heart-pulse and pastel cloud is made to comfort you. Let yourself be.",
+  "Breathe slow, feel the sparkle — you’re cherished in every way that matters.",
+  "This is your gentle sanctuary: hush, glow, journal, and let kindness float.",
+  "Your feelings decorate this space — nothing too small, too big, or too much.",
+  "Softness isn’t weakness but magic; let it fill these dreamy, friendly rooms.",
+  "Let your mind unfurl; here, every gentle wish is a distant, twinkling star."
+];
+
+// Helper to pick the "daily" whisper (rotates each day, fallback to random)
+function getDailyWhisper() {
+  const day = new Date().getDate();
+  return INTRO_WHISPERS[day % INTRO_WHISPERS.length];
+}
+
+// Floating magical intro card at the top of the Home screen
+function DreamyIntroCard() {
+  // Heart pulse state for gentle animation
+  const [pulse, setPulse] = useState(true);
+  useEffect(() => {
+    const interval = setInterval(() => setPulse(v => !v), 2100);
+    return () => clearInterval(interval);
+  }, []);
+
+  // For sparkle fade-ins
+  const sparkleCount = 12;
+  const sparkles = Array.from({ length: sparkleCount }).map((_, i) => ({
+    left: 12 + Math.random() * 76 + "%",
+    top: 10 + Math.random() * 45 + "%",
+    size: Math.random() * 11 + 16,
+    delay: i * 0.19 + Math.random(),
+    key: `sparkle-${i}`,
+    rotate: Math.random() * 35 - 13
+  }));
+
+  return (
+    <div className="dreamy-intro-card">
+      {/* Pastel blurred floating background */}
+      <div className="intro-bg-blur" />
+      {/* Sparkles */}
+      {sparkles.map((s) => (
+        <span
+          key={s.key}
+          className="intro-sparkle"
+          style={{
+            left: s.left,
+            top: s.top,
+            fontSize: s.size + "px",
+            animationDelay: `${s.delay}s`,
+            transform: `rotate(${s.rotate}deg)`
+          }}
+          aria-hidden="true"
+        >✨</span>
+      ))}
+      {/* Heart pulse animation (center left) */}
+      <span
+        className={`intro-heart${pulse ? " pulse" : ""}`}
+        style={{
+          left: "17px",
+          top: "20px",
+          fontSize: "1.55em"
+        }}
+        aria-label="love"
+        role="img"
+      >💖</span>
+      {/* Handwritten poetic greeting */}
+      <div className="intro-message">
+        <span className="handwritten">{getDailyWhisper()}</span>
+      </div>
+    </div>
+  );
+}
 // Dreamy moods with corresponding gradients, sounds, and particles
 const MOODS = [
   {
@@ -499,7 +574,7 @@ function loadRoomState() {
  * mood selection, magical avatar/affirmation, persistent upgrades, and gentle, emotionally-charged effects.
  */
 function HomeScreen() {
-  // Local state: decor, mood, avatar pose, affirmation, show welcome
+  // Local state: decor, mood, avatar pose, affirmation
   const [decors, setDecors] = useState([]);
   const [draggingType, setDraggingType] = useState(null);
   const [curMood, setCurMood] = useState(MOODS[0].key);
@@ -507,7 +582,6 @@ function HomeScreen() {
   const [affirm, setAffirm] = useState(getAffirmation());
   const [animAffirm, setAnimAffirm] = useState(false);
   const [showMood, setShowMood] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(false);
   const moodBtnRef = useRef();
 
   // Load room state on mount
@@ -518,8 +592,6 @@ function HomeScreen() {
       setCurMood(state.mood || MOODS[0].key);
       setAvatarPose(state.avatarPose || "sit");
       setAffirm(state.affirm || getAffirmation());
-      setShowWelcome(true);
-      setTimeout(() => setShowWelcome(false), 2600);
     }
   }, []);
   // Save any state changes
@@ -573,7 +645,6 @@ function HomeScreen() {
   }
   function handleInteraction(action) {
     handlePose(action);
-    // Soft extra effect for tea/cuddle/hug
     setAnimAffirm(true);
     setTimeout(() => setAnimAffirm(false), 1300);
   }
@@ -586,194 +657,184 @@ function HomeScreen() {
   // Get mood config
   const moodCfg = MOODS.find((m) => m.key === curMood) || MOODS[0];
 
-  // Ambient mood sound/effects could go here (not implemented: audio assets pending)
-  // (Plays/changes soft music/ambience here.)
-
+  // --- Dreamy HomeScreen Layout with new floating intro card and sparkles ---
   return (
     <main
-      className="floating-screen"
+      className="main-home-dreamy"
       style={{
         background: moodCfg.bg,
-        minHeight: 470,
-        maxWidth: 490,
-        boxShadow: moodCfg.glow
-          ? `0 12px 48px ${moodCfg.glow}, 0 4px 32px #b794f61c`
-          : "var(--card-shadow)"
+        minHeight: "calc(100vh - 0px)",
+        width: "100%",
+        maxWidth: "none",
+        boxShadow: "none",
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: 0,
+        overflow: "visible"
       }}
     >
-      {/* Toolbar */}
-      <FloatingToolbar onAdd={addDecor} dragAddType={draggingType} />
-      {/* Welcome bubble on load */}
-      {showWelcome && (
-        <div
-          style={{
-            position: "absolute",
-            left: "50%",
-            top: 42,
-            transform: "translateX(-50%)",
-            background: "#fff6fab4",
-            color: "#b794f6",
-            borderRadius: 29,
-            boxShadow: "0 2px 20px #ffd1dc33",
-            fontSize: "1.13em",
-            fontWeight: 600,
-            fontFamily: "'Poppins', cursive",
-            padding: "17px 35px",
-            zIndex: 55,
-            transition: "opacity 0.3s"
-          }}
-        >
-          Welcome back to your dreamy sanctuary...
-        </div>
-      )}
-      {/* Magical mood particles */}
-      <ParticlesAnim type={moodCfg.particles} num={16} />
-      {/* Mood-changing ambient breathing glow */}
-      <div
+      {/* Floating Dreamy Intro Card (fills top, floating above all else except sidebar) */}
+      <DreamyIntroCard />
+      {/* Magical animated sparkles for main area (pastel style, always on) */}
+      <div className="main-global-sparkles" aria-hidden="true">
+        {[...Array(13)].map((_, i) => (
+          <span
+            key={`magicsparkle${i}`}
+            className="ambient-magic-sparkle"
+            style={{
+              left: `${10 + Math.random() * 75}%`,
+              top: `${18 + Math.random() * 77}%`,
+              fontSize: `${17 + Math.random() * 17}px`,
+              opacity: `${0.52 + Math.random() * 0.42}`,
+              animationDelay: `${Math.random() * 3.5}s`,
+              filter: "blur(0.3px)"
+            }}
+          >✨</span>
+        ))}
+      </div>
+      {/* Main dreamy floating card for room/controls */}
+      <section
+        className="dreamy-floating-room-section"
         style={{
-          position: "absolute",
-          left: 0, top: 0, width: "100%", height: "100%",
-          zIndex: 0, pointerEvents: "none",
-          borderRadius: "calc(var(--border-radius) + 12px)",
-          boxShadow: `0 0 70px 18px ${moodCfg.glow || "#ffd1dc55"}`,
-          opacity: 0.42,
-          animation: "breathGlow 3.8s ease-in-out infinite"
-        }}
-      />
-      <style>
-        {`@keyframes breathGlow {0%{opacity:0.22;} 55%{opacity:0.51;} 100%{opacity:0.22;}}`}
-      </style>
-      {/* Dreamy layered room */}
-      <div
-        style={{
-          position: "relative",
-          width: 355,
-          height: 255,
-          background:
-            "linear-gradient(125deg, #fff8fd 70%, #f0e4f7 100%)",
-          border: "2.8px solid #b794f6",
-          borderRadius: 38,
-          margin: "0 auto 2.15em auto",
-          marginTop: 22,
-          boxShadow: "0 10px 38px #b794f62c, 0 2px 19px #ffd1dc10",
-          overflow: "visible"
+          marginTop: "clamp(120px,21vw,176px)",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          zIndex: 1
         }}
       >
-        {/* Soft wallpaper overlay */}
+        {/* Toolbar for adding decor */}
+        <FloatingToolbar onAdd={addDecor} dragAddType={draggingType} />
+        {/* Mood-changing ambient breathing glow */}
         <div
           style={{
             position: "absolute",
             left: 0, top: 0, width: "100%", height: "100%",
-            borderRadius: 36,
-            background: moodCfg.bg,
-            opacity: 0.2,
-            zIndex: 1
+            zIndex: 0, pointerEvents: "none",
+            borderRadius: "calc(var(--border-radius) + 22px)",
+            boxShadow: `0 0 90px 22px ${moodCfg.glow || "#ffd1dc55"}`,
+            opacity: 0.32,
+            animation: "breathGlow 4.8s ease-in-out infinite"
           }}
         />
-        {/* Decors (layered) */}
-        {decors.map((item) => (
-          <DecorItem
-            key={item.type}
-            item={item}
-            isActive={draggingType === item.type}
-            onStartDrag={setDraggingType}
-            onDrop={dropDecor}
-            onDelete={deleteDecor}
-            onUpdate={updateDecor}
-            dragging={draggingType === item.type}
-          />
-        ))}
-        {/* Floating magical avatar, centered */}
+        <style>
+          {`@keyframes breathGlow {0%{opacity:0.17;} 55%{opacity:0.44;} 100%{opacity:0.17;}}`}
+        </style>
+        {/* Dreamy layered room */}
         <div
           style={{
-            position: "absolute",
-            left: "48%",
-            top: avatarPose === "sit" ? 168 : avatarPose === "stand" ? 122 : 150,
-            transform: "translate(-50%, -50%)",
-            zIndex: 5
+            position: "relative",
+            width: 355,
+            height: 255,
+            background: "linear-gradient(125deg, #fff8fd 70%, #f0e4f7 100%)",
+            border: "2.8px solid #b794f6",
+            borderRadius: 38,
+            margin: "0 auto 2.15em auto",
+            marginTop: 22,
+            boxShadow: "0 10px 38px #b794f62c, 0 2px 19px #ffd1dc10",
+            overflow: "visible"
           }}
         >
-          <span
+          {/* Soft wallpaper overlay */}
+          <div
             style={{
-              fontSize: "2.7em",
-              filter: "drop-shadow(0 2px 11px #ffd1dc72)"
+              position: "absolute",
+              left: 0, top: 0, width: "100%", height: "100%",
+              borderRadius: 36,
+              background: moodCfg.bg,
+              opacity: 0.22,
+              zIndex: 1
             }}
-            title="Avatar"
+          />
+          {/* Decors (layered) */}
+          {decors.map((item) => (
+            <DecorItem
+              key={item.type}
+              item={item}
+              isActive={draggingType === item.type}
+              onStartDrag={setDraggingType}
+              onDrop={dropDecor}
+              onDelete={deleteDecor}
+              onUpdate={updateDecor}
+              dragging={draggingType === item.type}
+            />
+          ))}
+          {/* Floating magical avatar, centered */}
+          <div
+            style={{
+              position: "absolute",
+              left: "48%",
+              top: avatarPose === "sit" ? 168 : avatarPose === "stand" ? 122 : 150,
+              transform: "translate(-50%, -50%)",
+              zIndex: 5
+            }}
           >
-            {AVATAR_POSES.find((p) => p.pose === avatarPose)?.emoji || "🧸"}
-          </span>
+            <span
+              style={{
+                fontSize: "2.7em",
+                filter: "drop-shadow(0 2px 11px #ffd1dc72)"
+              }}
+              title="Avatar"
+            >
+              {AVATAR_POSES.find((p) => p.pose === avatarPose)?.emoji || "🧸"}
+            </span>
+          </div>
         </div>
-      </div>
-      {/* Avatar + interaction area */}
-      <AvatarSection
-        pose={avatarPose}
-        onPose={handlePose}
-        mood={curMood}
-        onAffirm={gentleAffirm}
-        affirmText={affirm}
-        onInteract={handleInteraction}
-        animAffirm={animAffirm}
-      />
-      {/* Mood selector button */}
-      <button
-        ref={moodBtnRef}
-        className="pastel-btn"
-        style={{
-          marginTop: "0.6em",
-          marginBottom: "0.7em",
-          fontSize: "1.04em",
-          border: "2px solid #b794f633",
-          boxShadow: "0 3px 12px #ffd1dc34",
-          borderRadius: 19
-        }}
-        onClick={() => setShowMood((v) => !v)}
-      >
-        Change Room Mood&nbsp;
-        <span aria-label="mood">
-          {{
-            rainy: "🌧️", sunset: "🌅", nightsky: "🌠", strawberryfog: "🍓", sakura: "🌸"
-          }[curMood] || "✨"}
-        </span>
-      </button>
-      {showMood && (
-        <MoodMenu
-          moods={MOODS}
-          selectedMood={curMood}
-          onSelect={handleMood}
-          onClose={() => setShowMood(false)}
-          anchorRef={moodBtnRef}
+        {/* Avatar + interaction area */}
+        <AvatarSection
+          pose={avatarPose}
+          onPose={handlePose}
+          mood={curMood}
+          onAffirm={gentleAffirm}
+          affirmText={affirm}
+          onInteract={handleInteraction}
+          animAffirm={animAffirm}
         />
-      )}
-      {/* Whisper bubble */}
-      <div
-        style={{
-          background: "rgba(194,233,251,0.15)",
-          borderRadius: 14,
-          margin: "0 auto",
-          padding: "0.7em 1.3em",
-          color: "#b794f6",
-          fontSize: "1.03em",
-          maxWidth: 320,
-          fontFamily: "'Poppins', cursive, sans-serif",
-          marginTop: "1.19em",
-          boxShadow: "0 2px 9px #b794f611"
-        }}
-      >
-        <span role="img" aria-label="Whisper Bubble" style={{ fontSize: "1.21em" }}>💬</span>{" "}
-        Whisper Bubble: {getAffirmation()}
-      </div>
-      {/* Magical floating sparkles UI */}
+        {/* Mood selector button and gentle mood menu */}
+        <button
+          ref={moodBtnRef}
+          className="pastel-btn"
+          style={{
+            marginTop: "0.6em",
+            marginBottom: "0.7em",
+            fontSize: "1.04em",
+            border: "2px solid #b794f633",
+            boxShadow: "0 3px 12px #ffd1dc34",
+            borderRadius: 19
+          }}
+          onClick={() => setShowMood((v) => !v)}
+        >
+          Change Room Mood&nbsp;
+          <span aria-label="mood">
+            {{
+              rainy: "🌧️", sunset: "🌅", nightsky: "🌠", strawberryfog: "🍓", sakura: "🌸"
+            }[curMood] || "✨"}
+          </span>
+        </button>
+        {showMood && (
+          <MoodMenu
+            moods={MOODS}
+            selectedMood={curMood}
+            onSelect={handleMood}
+            onClose={() => setShowMood(false)}
+            anchorRef={moodBtnRef}
+          />
+        )}
+      </section>
       <style>
         {`
-          .decor-item:focus, .decor-item:hover {
-            box-shadow: 0 14px 38px #ffd1dc58, 0 3px 13px #b794f640;
-            outline: none;
-          }
-          .toolbar-btn.active, .toolbar-btn:hover {
-            box-shadow: 0 3px 18px #b794f678;
-            background: #ffd1dc55 !important;
-            transform: scale(1.08);
-          }
+        .decor-item:focus, .decor-item:hover {
+          box-shadow: 0 14px 38px #ffd1dc58, 0 3px 13px #b794f640;
+          outline: none;
+        }
+        .toolbar-btn.active, .toolbar-btn:hover {
+          box-shadow: 0 3px 18px #b794f678;
+          background: #ffd1dc55 !important;
+          transform: scale(1.08);
+        }
         `}
       </style>
     </main>
