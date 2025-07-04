@@ -872,78 +872,126 @@ function HomeScreen() {
   // Get mood config
   const moodCfg = MOODS.find((m) => m.key === curMood) || MOODS[0];
 
-  // ---- OPEN PASTEL SECTION BUBBLES (wide, floaty) ----
+  // ---- OPEN PASTEL SECTION BUBBLES (spacious, wide rows beside sidebar) ----
   return (
     <main
       className="main-home-dreamy"
       style={{
         background: moodCfg.bg,
-        minHeight: "calc(100vh - 0px)",
+        minHeight: "100vh",
         width: "100%",
         maxWidth: "none",
         boxShadow: "none",
         position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "0", overflow: "visible"
+        display: "block", // now block so bubbles are true full-rows (not flex centered)
+        padding: 0,
+        overflow: "visible"
       }}
     >
-      {/* Ambient pastel particles */}
+      {/* Ambient pastel particles in bg */}
       <AmbientParticles />
-      {/* 1: Intro/Whisper/Greeting */}
-      <HomeIntroSection />
-      {/* 2: Room mood section */}
-      <MoodSection
-        curMood={curMood}
-        onChangeMood={handleMood}
-        showMood={showMood}
-        setShowMood={setShowMood}
-        moodBtnRef={moodBtnRef}
-      />
-      {/* 3: Avatar & Actions */}
-      <AvatarAreaSection
-        pose={avatarPose}
-        onPose={handlePose}
-        curMood={curMood}
-        onAffirm={gentleAffirm}
-        affirmText={affirm}
-        onInteract={handleInteraction}
-        animAffirm={animAffirm}
-      />
-      {/* 4: Room Decor - open, wide */}
-      <RoomDecorSection
-        decors={decors}
-        draggingType={draggingType}
-        addDecor={addDecor}
-        updateDecor={updateDecor}
-        dropDecor={dropDecor}
-        deleteDecor={deleteDecor}
-      />
-      {/* 5: Affirmation Section */}
-      <AffirmationSection affirm={affirm} />
 
+      {/* Intro/Whisper – spacious top bubble */}
+      <div style={{ width: "100%", padding: 0, margin: 0, display: "block" }}>
+        <HomeIntroSection />
+      </div>
+      <div
+        aria-hidden="true"
+        style={{
+          height: 0, margin: 0, border: 0, borderBottom: "5px solid #ffd1dc1c",
+          width: "81%", maxWidth: 1080, marginLeft:"auto", marginRight:"auto"
+        }}
+      ></div>
+
+      {/* Room Mood control – floated full width row */}
+      <div style={{ width: "100%", margin: 0, display: "block" }}>
+        <MoodSection
+          curMood={curMood}
+          onChangeMood={handleMood}
+          showMood={showMood}
+          setShowMood={setShowMood}
+          moodBtnRef={moodBtnRef}
+        />
+      </div>
+      <div
+        aria-hidden="true"
+        style={{
+          height: 0, border: 0, borderBottom: "4px solid #c2e9fb23",
+          width: "73%", maxWidth: 1020, marginLeft:"auto", marginRight:"auto"
+        }}
+      ></div>
+
+      {/* Avatar actions – floaty, wide row */}
+      <div style={{ width: "100%", margin: 0, display: "block" }}>
+        <AvatarAreaSection
+          pose={avatarPose}
+          onPose={handlePose}
+          curMood={curMood}
+          onAffirm={gentleAffirm}
+          affirmText={affirm}
+          onInteract={handleInteraction}
+          animAffirm={animAffirm}
+        />
+      </div>
+      <div
+        aria-hidden="true"
+        style={{
+          height: 0, border: 0, borderBottom: "3px solid #b794f629",
+          width: "66%", maxWidth: 940, marginLeft:"auto", marginRight:"auto"
+        }}
+      ></div>
+
+      {/* Room Decor – biggest open section, full width */}
+      <div style={{ width: "100%", margin: 0, display: "block" }}>
+        <RoomDecorSection
+          decors={decors}
+          draggingType={draggingType}
+          addDecor={addDecor}
+          updateDecor={updateDecor}
+          dropDecor={dropDecor}
+          deleteDecor={deleteDecor}
+        />
+      </div>
+      <div
+        aria-hidden="true"
+        style={{
+          height: 0, border: 0, borderBottom: "2.8px solid #ffd1dc22",
+          width: "77%", maxWidth: 940, marginLeft:"auto", marginRight:"auto"
+        }}
+      ></div>
+
+      {/* Affirmation Section – bottom bubble */}
+      <div style={{ width: "100%", margin: "0 0 2.4em 0", display: "block" }}>
+        <AffirmationSection affirm={affirm} />
+      </div>
+
+      {/* Extra: gently animate each section bubble in <style> for responsive openness */}
       <style>
         {`
         .home-section-bubble {
           box-sizing: border-box;
-          margin-left: auto; margin-right: auto;
+          width: 96vw;
+          max-width: 1140px;
+          margin: 1.8em auto;
           transition: box-shadow .17s, background .17s, border-bottom .14s;
           animation: bubbleFloatIn 1.05s cubic-bezier(.63,1.13,.47,0.95);
           will-change: opacity, transform;
         }
-        @keyframes bubbleFloatIn {
-          from { opacity: 0; transform: translateY(31px) scale(0.97);}
-          to   { opacity: 1; transform: translateY(0) scale(1);}
-        }
-        @media (max-width: 1040px) {
+        @media (max-width: 1300px) {
           .home-section-bubble { max-width: 99vw; }
+        }
+        @media (max-width: 900px) {
+          .home-section-bubble { width: 99vw; min-width: 0;}
         }
         @media (max-width: 700px) {
           .home-section-bubble { padding-left: 0.5em; padding-right: 0.5em;}
         }
         @media (max-width: 490px) {
           .home-section-bubble { padding: 1em 2vw 0.9em 2vw; }
+        }
+        @keyframes bubbleFloatIn {
+          from { opacity: 0; transform: translateY(31px) scale(0.97);}
+          to   { opacity: 1; transform: translateY(0) scale(1);}
         }
         `}
       </style>
