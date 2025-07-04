@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { theme } from "../theme";
 import "../ui/GlobalStyle.css";
+import { getSpotifyAccessToken, searchTracksForVibe } from "../utils/spotifyApi";
 
 /**
  * PUBLIC_INTERFACE
@@ -332,16 +333,8 @@ const dreamySpotifyResults = [
 ];
 
 // ---- Quiz Results Card (soft pastel, gentle intro) ----
-function QuizResults({ selections, onRetake }) {
-  // In real implementation, would fetch Spotify tracks matching traits
-  // Here, filter mock data for mood and shuffle in random order for demo
-  let filtered = dreamySpotifyResults;
-  if (selections?.mood) {
-    filtered = dreamySpotifyResults.filter(x=>x.mood === selections.mood) || dreamySpotifyResults;
-  }
-  // Shuffle for visual interest
-  filtered = [...filtered].sort(()=>Math.random()-0.5);
-  // Dreamy result transition (fade in, pastel float)
+function QuizResults({ selections, onRetake, tracks, error, loading }) {
+  // Real Spotify Results Card
   return (
     <div className="quiz-results-card dreamy-quiz-results"
       style={{
@@ -374,57 +367,84 @@ function QuizResults({ selections, onRetake }) {
         Dreamy Tracks for Your Mood
         <span style={{marginLeft:6}} role="img" aria-label="sparkle">✨</span>
       </div>
-      {/* Results list */}
+      {/* Results/error/state list */}
       <div style={{
         display: "flex", flexDirection: "column", alignItems: "center",
+        minHeight: "92px",
         gap: "2.5em", marginTop: "0.6em"
       }}>
-        {filtered.slice(0, 3).map((track, idx) => (
-          <div key={track.spotify}
-            style={{
-              borderRadius: 27,
-              boxShadow: "0 3px 29px #ffd1dc2A, 0 1px 9px #b794f63a",
-              background: "linear-gradient(103deg,#fff8fc 80%,#f9f7ff 130%)",
-              marginBottom: "0.8em",
-              width: "100%",
-              maxWidth: 350,
-              padding: "1.1em 0.45em 1.2em 0.45em",
-              position: "relative",
-              opacity: 0.95,
-              filter: "blur(0px) drop-shadow(0 0px 8px #b794f630)",
-              animation: "resultCardFloatIn .9s cubic-bezier(.75,1.1,.49,1.13)",
-              animationDelay: `${0.2*idx+0.19}s`
-            }}
-          >
-            {/* Emoji album / mood */}
-            <div style={{
-              fontSize: "1.8em", marginBottom: 3, textAlign: "center",
-              filter:"drop-shadow(0 2px 9px #b794f652)"
-            }}>{SPARKLE_EMOJIS[idx%SPARKLE_EMOJIS.length]}</div>
-            <div style={{
-              color: "#b794f6", fontWeight: 700, fontSize: "1.09em", textAlign:"center",
-              fontFamily: "'Poppins', cursive"
-            }}>{track.name}</div>
-            <div style={{
-              color: "#8a7fae", fontWeight: 500, fontSize: "0.97em", marginBottom:8
-            }}>{track.artist}</div>
-            <iframe
-              src={track.spotify}
-              width="100%"
-              height="80"
-              style={{
-                borderRadius: 19,
-                border: "none",
-                filter: "saturate(1.06) drop-shadow(0 0px 16px #c2e9fb28)",
-                background: "#fff",
-                marginTop: 7
-              }}
-              title={`spotify-${idx}`}
-              allow="encrypted-media"
-              loading="lazy"
-            ></iframe>
+        {loading && (
+          <div style={{ color: "#b794f6", fontWeight: 600, fontSize: "1.11em", fontFamily: "'Poppins', cursive" }}>
+            Fetching dreamy music from the clouds...
           </div>
-        ))}
+        )}
+        {error && (
+          <div style={{
+            color: "#febbbb",
+            fontWeight: 700,
+            fontSize: "1em",
+            padding: "1.3em 0 1.2em 0",
+            textAlign: "center",
+            background: "#fff4f8bb",
+            borderRadius: "16px",
+            boxShadow: "0 2px 12px #ffd1dc28"
+          }}>
+            Sorry, we couldn't find music for this vibe.<br />
+            <span style={{color:"#b794f6"}}>Try a different mood or check your connection.<br/></span>
+            <span style={{fontSize:"1.6em"}}>🌥️</span>
+          </div>
+        )}
+        {!loading && !error && Array.isArray(tracks) && tracks.length > 0 && (
+          tracks.slice(0, 5).map((track, idx) => {
+            // spotify id: track.id, url embed: https://open.spotify.com/embed/track/{track.id}
+            const artistsStr = (track.artists || []).map(a=>a.name).join(", ");
+            return (
+              <div key={track.id}
+                style={{
+                  borderRadius: 27,
+                  boxShadow: "0 3px 29px #ffd1dc2A, 0 1px 9px #b794f63a",
+                  background: "linear-gradient(103deg,#fff8fc 80%,#f9f7ff 130%)",
+                  marginBottom: "0.8em",
+                  width: "100%",
+                  maxWidth: 350,
+                  padding: "1.1em 0.45em 1.2em 0.45em",
+                  position: "relative",
+                  opacity: 0.97,
+                  filter: "blur(0px) drop-shadow(0 0px 8px #b794f630)",
+                  animation: "resultCardFloatIn .9s cubic-bezier(.75,1.1,.49,1.13)",
+                  animationDelay: `${0.2*idx+0.19}s`
+                }}
+              >
+                <div style={{
+                  fontSize: "1.8em", marginBottom: 3, textAlign: "center",
+                  filter:"drop-shadow(0 2px 9px #b794f652)"
+                }}>{SPARKLE_EMOJIS[idx%SPARKLE_EMOJIS.length]}</div>
+                <div style={{
+                  color: "#b794f6", fontWeight: 700, fontSize: "1.09em", textAlign:"center",
+                  fontFamily: "'Poppins', cursive"
+                }}>{track.name || "Dreamy Track"}</div>
+                <div style={{
+                  color: "#8a7fae", fontWeight: 500, fontSize: "0.97em", marginBottom:8
+                }}>{artistsStr}</div>
+                <iframe
+                  src={`https://open.spotify.com/embed/track/${track.id}`}
+                  width="100%"
+                  height="80"
+                  style={{
+                    borderRadius: 19,
+                    border: "none",
+                    filter: "saturate(1.06) drop-shadow(0 0px 16px #c2e9fb28)",
+                    background: "#fff",
+                    marginTop: 7
+                  }}
+                  title={`spotify-track-${track.id}`}
+                  allow="encrypted-media"
+                  loading="lazy"
+                ></iframe>
+              </div>
+            );
+          })
+        )}
       </div>
       {/* Retake btn */}
       <div style={{
@@ -465,6 +485,58 @@ function MusicScreen() {
   const [selections, setSelections] = useState({});
   const [showResult, setShowResult] = useState(false);
 
+  // --- Spotify Integration State ---
+  const [spotifyLoading, setSpotifyLoading] = useState(false);
+  const [spotifyTracks, setSpotifyTracks] = useState([]);
+  const [spotifyError, setSpotifyError] = useState(null);
+
+  // On showing result: fetch tracks for curr selections
+  React.useEffect(() => {
+    if (showResult) {
+      setSpotifyLoading(true);
+      setSpotifyError(null);
+      setSpotifyTracks([]);
+      // Run fetch in async closure
+      (async () => {
+        try {
+          // Only fetch if quiz fully completed
+          if (!selections.color || !selections.mood || !selections.aesthetic) {
+            setSpotifyTracks([]);
+            setSpotifyLoading(false);
+            return;
+          }
+          const accessToken = await getSpotifyAccessToken();
+          let tracksRaw = await searchTracksForVibe(selections, accessToken);
+          // Only keep tracks with playable preview/embeddable id
+          tracksRaw = Array.isArray(tracksRaw)
+            ? tracksRaw.filter(
+                (t) =>
+                  t.id &&
+                  t.name &&
+                  (t.preview_url || t.external_urls?.spotify)
+              )
+            : [];
+          // Shuffle and pick 3–5 random
+          let tracks = tracksRaw.sort(() => Math.random() - 0.5).slice(0, 5);
+          setSpotifyTracks(tracks);
+          if (!tracks.length) setSpotifyError("No tracks found for this vibe.");
+        } catch (err) {
+          setSpotifyError(
+            typeof err === "string"
+              ? err
+              : (err && err.message
+                ? err.message
+                : "Could not fetch music from Spotify.")
+          );
+          setSpotifyTracks([]);
+        } finally {
+          setSpotifyLoading(false);
+        }
+      })();
+    }
+  // eslint-disable-next-line
+  }, [showResult, selections.color, selections.mood, selections.aesthetic]);
+
   function handleSelect(val) {
     // Save selection and advance
     const curKey = QUIZ_STEPS[stepIdx].key;
@@ -484,6 +556,9 @@ function MusicScreen() {
     setShowResult(false);
     setSelections({});
     setStepIdx(0);
+    setSpotifyLoading(false);
+    setSpotifyTracks([]);
+    setSpotifyError(null);
   }
 
   function retakeQuiz() {
@@ -491,6 +566,9 @@ function MusicScreen() {
     setShowResult(false);
     setSelections({});
     setStepIdx(0);
+    setSpotifyLoading(false);
+    setSpotifyTracks([]);
+    setSpotifyError(null);
   }
 
   return (
@@ -527,7 +605,13 @@ function MusicScreen() {
 
       {/* Results */}
       {showResult && (
-        <QuizResults selections={selections} onRetake={retakeQuiz} />
+        <QuizResults
+          selections={selections}
+          onRetake={retakeQuiz}
+          tracks={spotifyTracks}
+          error={spotifyError}
+          loading={spotifyLoading}
+        />
       )}
 
       <style>
