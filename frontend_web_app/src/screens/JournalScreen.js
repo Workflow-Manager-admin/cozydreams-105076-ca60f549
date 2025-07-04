@@ -1,5 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import "./JournalScreen.css";
 
+// PUBLIC_INTERFACE
+/**
+ * JournalScreen
+ * Dreamy, magical journaling hub with daily prompt, floating energetic archive, glowing modal, lo-fi visual/audio "focus mode",
+ * pastel floating bubbles, sparkly reward effects, and full local persistence.
+ */
 /**
  * PUBLIC_INTERFACE
  * JournalScreen

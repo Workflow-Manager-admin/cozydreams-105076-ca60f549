@@ -6,9 +6,9 @@ Attempting to bind to HOST environment variable: 0.0.0.0
 If this was unintentional, check that you haven't mistakenly set it in your shell.
 Learn more here: https://cra.link/advanced-config
 
-(node:27020) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:30557) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:27020) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:30557) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -23,21 +23,59 @@ To create a production build, use npm run build.
 
 webpack compiled successfully
 Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve './JournalScreen.css' in '/home/kavia/workspace/code-generation/cozydreams-105076-ca60f549/frontend_web_app/src/screens'
+WARNING in [eslint] 
+src/screens/JournalScreen.js
+  Line 1:27:  'useEffect' is defined but never used  no-unused-vars
+  Line 1:38:  'useRef' is defined but never used     no-unused-vars
+
+ERROR in ./src/screens/JournalScreen.js 6:0-29
+Module not found: Error: Can't resolve './JournalScreen.css' in '/home/kavia/workspace/code-generation/cozydreams-105076-ca60f549/frontend_web_app/src/screens'
+
+webpack compiled with 1 error and 1 warning
+Compiling...
+Failed to compile.
+
+Syntax error: /home/kavia/workspace/code-generation/cozydreams-105076-ca60f549/frontend_web_app/src/screens/JournalScreen.css Unknown word (380:1)
+  378 | }
+  379 | 
+> 380 | >>>>>>> REPLACE
+      | ^
+  381 |
+WARNING in [eslint] 
+src/screens/JournalScreen.js
+  Line 1:27:  'useEffect' is defined but never used  no-unused-vars
+  Line 1:38:  'useRef' is defined but never used     no-unused-vars
+
+ERROR in ./src/screens/JournalScreen.css (./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/screens/JournalScreen.css)
+Module build failed (from ./node_modules/postcss-loader/dist/cjs.js):
+SyntaxError
+
+(380:1) /home/kavia/workspace/code-generation/cozydreams-105076-ca60f549/frontend_web_app/src/screens/JournalScreen.css Unknown word
+
+  378 | }
+  379 | 
+> 380 | >>>>>>> REPLACE
+      | ^
+  381 |
+
+webpack compiled with 1 error and 1 warning
+Compiling...
 Compiled with warnings.
 
 [eslint] 
-src/screens/ProfileScreen.js
-  Line 4:10:    'theme' is defined but never used                no-unused-vars
-  Line 233:10:  'profilePic' is assigned a value but never used  no-unused-vars
-  Line 316:9:   'prevAudio' is assigned a value but never used   no-unused-vars
+src/screens/JournalScreen.js
+  Line 1:27:  'useEffect' is defined but never used  no-unused-vars
+  Line 1:38:  'useRef' is defined but never used     no-unused-vars
 
 Search for the keywords to learn more about each warning.
 To ignore, add // eslint-disable-next-line to the line before.
 
 WARNING in [eslint] 
-src/screens/ProfileScreen.js
-  Line 4:10:    'theme' is defined but never used                no-unused-vars
-  Line 233:10:  'profilePic' is assigned a value but never used  no-unused-vars
-  Line 316:9:   'prevAudio' is assigned a value but never used   no-unused-vars
+src/screens/JournalScreen.js
+  Line 1:27:  'useEffect' is defined but never used  no-unused-vars
+  Line 1:38:  'useRef' is defined but never used     no-unused-vars
 
 webpack compiled with 1 warning
